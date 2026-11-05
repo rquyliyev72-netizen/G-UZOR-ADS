@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>ISHONCH mebel — 0-0-12</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #062419; }
+  body { font-family: 'Inter', 'Noto Color Emoji', sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(120% 70% at 50% 45%, #13704a 0%, #0a4630 45%, #052116 100%); }
+  #rays { position: absolute; left: 50%; top: 52%; width: 2600px; height: 2600px; margin: -1300px 0 0 -1300px;
+    background: repeating-conic-gradient(rgba(255,214,102,.07) 0 6deg, transparent 6deg 18deg);
+    -webkit-mask: radial-gradient(circle, #000 0%, transparent 60%); mask: radial-gradient(circle, #000 0%, transparent 60%); }
+  canvas { position: absolute; inset: 0; }
+  .el { position: absolute; left: 0; right: 0; text-align: center; opacity: 0; will-change: transform, opacity; }
+  .t-xl { font-weight: 900; font-size: 92px; line-height: 1.02; letter-spacing: -2px; }
+  .t-l  { font-weight: 900; font-size: 70px; line-height: 1.08; letter-spacing: -1px; }
+  .t-m  { font-weight: 800; font-size: 50px; line-height: 1.15; }
+  .t-s  { font-weight: 700; font-size: 40px; line-height: 1.25; }
+  .gold { color: #ffd166; }
+  .mint { color: #8ef0b9; }
+  .shadow { text-shadow: 0 6px 24px rgba(0,0,0,.45); }
+  .pill { display: inline-block; padding: 14px 34px; border-radius: 999px; background: #ffd166; color: #073b28;
+    font-weight: 900; font-size: 44px; letter-spacing: 1px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+  .pill.white { background: #fff; }
+  .chips { display: flex; justify-content: center; gap: 22px; }
+  .chip { width: 150px; height: 170px; border-radius: 30px; background: #fff; color: #0a4630; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 110px; box-shadow: 0 14px 34px rgba(0,0,0,.35); border-bottom: 10px solid #ffd166; }
+  .card { margin: 0 70px; display: flex; align-items: center; gap: 28px; padding: 22px 34px; border-radius: 30px;
+    background: rgba(255,255,255,.96); color: #0a3d2a; text-align: left; box-shadow: 0 14px 40px rgba(0,0,0,.3); }
+  .card b { font-size: 76px; font-weight: 900; color: #0f8a54; min-width: 170px; text-align: center; letter-spacing: -2px; }
+  .card span { font-size: 40px; font-weight: 800; line-height: 1.15; }
+  .card small { display: block; font-size: 30px; font-weight: 600; color: #4c6b5e; }
+  .glass { margin: 0 60px; padding: 30px 36px; border-radius: 34px; background: rgba(4,30,20,.72); border: 3px solid rgba(255,209,102,.55); }
+  .row { font-size: 40px; font-weight: 700; line-height: 1.3; text-align: left; }
+  .phone { font-size: 58px; font-weight: 900; letter-spacing: 1px; line-height: 1.25; }
+  .logo { font-weight: 900; font-size: 150px; letter-spacing: 6px; color: #fff; line-height: 1; }
+  .logo i { font-style: normal; color: #ffd166; }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+  #corner { position: absolute; right: 40px; top: 60px; left: auto; width: auto; }
+</style>
+<script type="importmap">{ "imports": { "three": "./lib/three.module.min.js" } }</script>
+</head>
+<body>
+<div id="stage">
+  <div id="rays"></div>
+  <canvas id="c" width="1080" height="1920"></canvas>
+
+  <!-- 1-sahna: savol -->
+  <div class="el shadow" data-in="0.25" data-out="5" data-fx="up" style="top:170px"><div class="t-m mint">💚 Eski mebellarni</div></div>
+  <div class="el shadow" data-in="0.55" data-out="5" data-fx="up" style="top:240px"><div class="t-xl">almashtirish<br>vaqti kelmadimikan?</div></div>
+  <div class="el" data-in="4.0" data-out="5" data-fx="pop" style="top:1500px"><span class="pill">✨ YANGILANISH VAQTI!</span></div>
+
+  <!-- 2-sahna: sanalar -->
+  <div class="el shadow" data-in="5.2" data-out="10" data-fx="up" style="top:150px"><div class="t-m mint">🩺 Tibbiyot xodimlari kuni<br>munosabati bilan</div></div>
+  <div class="el" data-in="5.6" data-out="10" data-fx="pop" style="top:330px"><div class="chips"><div class="chip">5</div><div class="chip">6</div><div class="chip">7</div><div class="chip">8</div></div></div>
+  <div class="el shadow" data-in="6.1" data-out="10" data-fx="up" style="top:525px"><div class="t-l gold">NOYABR</div></div>
+  <div class="el" data-in="6.6" data-out="10" data-fx="up" style="top:1480px"><div class="glass"><div class="t-m">Gʻuzor <span class="gold">ISHONCH</span> doʻkonida</div></div></div>
+  <div class="el" data-in="7.0" data-out="10" data-fx="pop" style="top:1640px"><span class="pill">BARCHA MEBELLARGA</span></div>
+
+  <!-- 3-sahna: 0-0-12 -->
+  <div class="el shadow" data-in="10.1" data-out="16.5" data-fx="up" style="top:160px"><div class="t-m mint">Mashhur aksiya boshlandi!</div></div>
+  <div class="el" data-in="11.3" data-out="16.5" data-fx="pop" style="top:760px"><span class="pill white">A K S I Y A</span></div>
+  <div class="el" data-in="12.0" data-out="16.5" data-fx="left" style="top:960px"><div class="card"><b>0</b><span>soʻm<small>boshlangʻich toʻlov</small></span></div></div>
+  <div class="el" data-in="12.6" data-out="16.5" data-fx="left" style="top:1160px"><div class="card"><b>0</b><span>soʻm<small>ustama</small></span></div></div>
+  <div class="el" data-in="13.2" data-out="16.5" data-fx="left" style="top:1360px"><div class="card"><b>12</b><span>oyga<small>teng boʻlib toʻlash</small></span></div></div>
+  <div class="el shadow" data-in="14.0" data-out="16.5" data-fx="up" style="top:1590px"><div class="t-s">🤗 Zarracha ham ortiqcha toʻlovsiz!</div></div>
+
+  <!-- 4-sahna: mahsulotlar -->
+  <div class="el" id="corner" data-in="16.7" data-out="25" data-fx="pop"><span class="pill" style="font-size:38px">0 · 0 · 12</span></div>
+  <div class="el shadow" data-in="16.6" data-out="18.7" data-fx="up" style="top:200px"><div class="t-xl">Divanlar</div><div class="t-s mint">Mehmonxona uchun</div></div>
+  <div class="el shadow" data-in="18.7" data-out="20.8" data-fx="up" style="top:200px"><div class="t-xl">Yotoqxona</div><div class="t-s mint">Karavot va tumbalar</div></div>
+  <div class="el shadow" data-in="20.8" data-out="22.9" data-fx="up" style="top:200px"><div class="t-xl">Shkaflar</div><div class="t-s mint">Koʻzguli, keng va qulay</div></div>
+  <div class="el shadow" data-in="22.9" data-out="25" data-fx="up" style="top:200px"><div class="t-xl">Oshxona</div><div class="t-s mint">Stol va stullar toʻplami</div></div>
+  <div class="el" data-in="17.2" data-out="25" data-fx="up" style="top:1470px"><div class="glass">
+    <div class="row">✅ Hech qanday rasmiy daromadsiz<br>&nbsp; &nbsp; &nbsp; ham xarid qilish imkoniyati</div>
+    <div class="row" style="margin-top:14px">🏠 Uyingizga shinamlik olib kiring!</div></div></div>
+
+  <!-- 5-sahna: sovrinlar -->
+  <div class="el shadow" data-in="25.1" data-out="30" data-fx="pop" style="top:150px"><div class="t-l gold">Bu hali hammasi emas! 🥰</div></div>
+  <div class="el shadow" data-in="25.6" data-out="30" data-fx="up" style="top:260px"><div class="t-m"><span class="gold">5 mln soʻm</span>dan ortiq xarid qiling<br>va yutib oling 🎉</div></div>
+  <div class="el" data-in="26.6" data-out="30" data-fx="left" style="top:1330px"><div class="card"><b>🚗</b><span>Damas<small>avtomobili</small></span></div></div>
+  <div class="el" data-in="27.1" data-out="30" data-fx="left" style="top:1490px"><div class="card"><b>✈️</b><span>Chet elga sayohat<small>Sharm ash-Shayx</small></span></div></div>
+  <div class="el" data-in="27.6" data-out="30" data-fx="left" style="top:1650px"><div class="card"><b>🎁</b><span>Qimmatbaho<small>sovgʻalar</small></span></div></div>
+
+  <!-- 6-sahna: manzil -->
+  <div class="el shadow" data-in="30.1" data-out="99" data-fx="pop" style="top:130px"><div class="logo">ISHON<i>CH</i></div><div class="t-s mint" style="letter-spacing:8px;margin-top:6px">MEBEL DOʻKONI · GʻUZOR</div></div>
+  <div class="el" data-in="30.6" data-out="99" data-fx="pop" style="top:400px"><span class="pill">5–8 NOYABR · 0-0-12</span></div>
+  <div class="el" data-in="31.0" data-out="99" data-fx="up" style="top:1180px"><div class="glass">
+    <div class="row">📍 Gʻuzor tumani, Obod MFY,<br>&nbsp; &nbsp; &nbsp; Mustaqillik koʻchasi</div>
+    <div class="row mint" style="margin-top:10px;font-size:36px">🧭 Moʻljal: Eski Alpomish supermarketi yonida</div>
+    <div style="height:3px;background:rgba(255,209,102,.4);margin:22px 0"></div>
+    <div class="phone">📞 +998 99 128 44 40</div>
+    <div class="phone">📞 +998 91 153 44 40</div>
+    <div class="phone">📞 +998 90 856 44 40</div></div></div>
+
+  <div id="flash"></div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from './lib/RoundedBoxGeometry.js';
+import { FontLoader } from './lib/FontLoader.js';
+import { TextGeometry } from './lib/TextGeometry.js';
+import { RoomEnvironment } from './lib/RoomEnvironment.js';
+
+const W = 1080, H = 1920;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, d) => clamp((t - a) / d);
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const easeBack = x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const bounce = x => { const n = 7.5625, d = 2.75;
+  if (x < 1 / d) return n * x * x; if (x < 2 / d) return n * (x -= 1.5 / d) * x + .75;
+  if (x < 2.5 / d) return n * (x -= 2.25 / d) * x + .9375; return n * (x -= 2.625 / d) * x + .984375; };
+
+// ---------- renderer ----------
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(renderer), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(36, W / H, 0.1, 100);
+scene.add(new THREE.HemisphereLight(0xfff6e5, 0x1c4a36, 0.7));
+const sun = new THREE.DirectionalLight(0xffffff, 2.0);
+sun.position.set(4, 9, 6); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
+Object.assign(sun.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 30 });
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xbfffe0, 0.6); fill.position.set(-6, 3, 2); scene.add(fill);
+
+// ---------- materials ----------
+const M = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: .85, metalness: 0, ...o });
+const mat = {
+  green: M(0x1f8a57), greenDark: M(0x166b43), cream: M(0xf1e6d2), beige: M(0xd9c3a0), white: M(0xf7f4ee, { roughness: .7 }),
+  wood: M(0x8a5a35, { roughness: .55 }), woodLight: M(0xc99a63, { roughness: .5 }), woodDark: M(0x5b3a22, { roughness: .5 }),
+  gold: M(0xf2c14e, { metalness: 1, roughness: .28 }), mirror: M(0xdfeaf0, { metalness: 1, roughness: .04 }),
+  glass: M(0x1a2b33, { metalness: .6, roughness: .08 }), rubber: M(0x1b1b1b, { roughness: .9 }), steel: M(0xc9cfd4, { metalness: .9, roughness: .3 }),
+  red: M(0xd7263d, { roughness: .45 }), mustard: M(0xe8a93a), leaf: M(0x2e9e5b, { roughness: .7 }), rug: M(0xe9dcc3, { roughness: 1 }),
+  oldFabric: M(0x7d6450, { roughness: 1, flatShading: true }), oldPatch: M(0x5a6b4a, { roughness: 1, flatShading: true }),
+  oldWood: M(0x4a3a2c, { roughness: 1 }), lampShade: M(0xfff1d0, { emissive: 0xffd88a, emissiveIntensity: .5, side: THREE.DoubleSide }),
+  headlight: M(0xffffff, { emissive: 0xfff4c0, emissiveIntensity: 1 }), podium: M(0xf4ecdc, { roughness: .6 }),
+};
+
+// ---------- builders ----------
+function rbox(w, h, d, r, m, x = 0, y = 0, z = 0) {
+  const mesh = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2 - .001, h / 2 - .001, d / 2 - .001)), m);
+  mesh.position.set(x, y, z); mesh.castShadow = mesh.receiveShadow = true; return mesh;
+}
+function cyl(rt, rb, h, m, x = 0, y = 0, z = 0, seg = 24) {
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m);
+  mesh.position.set(x, y, z); mesh.castShadow = mesh.receiveShadow = true; return mesh;
+}
+function group(...kids) { const g = new THREE.Group(); kids.forEach(k => g.add(k)); return g; }
+
+function sofa({ w = 2.4, seats = 3, fabric = mat.green, cushion = mat.green, accent = mat.mustard, legs = mat.gold, old = false } = {}) {
+  const g = new THREE.Group(), L = .14, armW = .24, base = .32, inner = w - armW * 2;
+  g.add(rbox(w - .04, base, .95, .06, fabric, 0, L + base / 2, 0));
+  const cw = inner / seats;
+  for (let i = 0; i < seats; i++) {
+    const x = -inner / 2 + cw * (i + .5);
+    const s = rbox(cw - .03, .2, .8, .08, cushion, x, L + base + .1, .06);
+    const b = rbox(cw - .04, .5, .22, .1, cushion, x, L + base + .38, -.3);
+    b.rotation.x = -.14;
+    if (old) { s.rotation.z = (i - 1) * .06; s.position.y -= .04 * (i % 2); b.rotation.z = (i - 1) * -.1; b.rotation.x = -.35 + i * .08; }
+    g.add(s, b);
+  }
+  g.add(rbox(w, .62, .2, .08, fabric, 0, L + .31 + .12, -.4));
+  for (const sx of [-1, 1]) g.add(rbox(armW, .56, .95, .1, fabric, sx * (w / 2 - armW / 2), L + .28, 0));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) g.add(cyl(.035, .025, L, legs, sx * (w / 2 - .12), L / 2, sz * .38, 12));
+  if (!old) {
+    for (const sx of [-1, 1]) { const p = rbox(.36, .36, .11, .08, accent, sx * (inner / 2 - .25), L + base + .38, -.12); p.rotation.set(-.2, 0, sx * .18); g.add(p); }
+  } else {
+    const patch = rbox(.3, .02, .25, .01, mat.oldPatch, .3, L + base + .21, .15); patch.rotation.z = .06; g.add(patch);
+    const patch2 = rbox(.22, .2, .02, .01, mat.oldPatch, -.6, L + .3, -.29); g.add(patch2);
+    g.children.filter(c => c.geometry.type === 'CylinderGeometry')[0].scale.y = .55; // singan oyoq
+    g.rotation.z = .035;
+  }
+  return g;
+}
+function coffeeTable() {
+  const g = group(cyl(.55, .55, .05, mat.white, 0, .45, 0, 48), cyl(.56, .56, .015, mat.gold, 0, .42, 0, 48));
+  for (let i = 0; i < 3; i++) { const a = i * Math.PI * 2 / 3; const l = cyl(.02, .02, .44, mat.gold, Math.cos(a) * .38, .21, Math.sin(a) * .38, 10); l.rotation.set(Math.sin(a) * .15, 0, -Math.cos(a) * .15); g.add(l); }
+  const vase = cyl(.07, .1, .22, mat.green, .1, .58, 0); g.add(vase);
+  return g;
+}
+function plant(s = 1) {
+  const g = group(cyl(.2, .15, .42, mat.white, 0, .21, 0));
+  const leafGeo = new THREE.IcosahedronGeometry(.2, 1);
+  const pts = [[0, .75, 0, 1.3], [.18, .62, .05, 1], [-.17, .66, .08, 1], [.05, .95, -.06, 1], [-.1, .9, .1, .9], [.14, .88, -.1, .9], [0, 1.1, 0, .8]];
+  for (const [x, y, z, k] of pts) { const m = new THREE.Mesh(leafGeo, mat.leaf); m.position.set(x, y, z); m.scale.setScalar(k); m.castShadow = true; g.add(m); }
+  g.scale.setScalar(s); return g;
+}
+function floorLamp() {
+  const shade = new THREE.Mesh(new THREE.CylinderGeometry(.2, .32, .36, 32, 1, true), mat.lampShade); shade.position.y = 1.62; shade.castShadow = true;
+  return group(cyl(.22, .24, .04, mat.gold, 0, .02, 0), cyl(.018, .018, 1.6, mat.gold, 0, .82, 0, 10), shade);
+}
+function bed() {
+  const g = new THREE.Group();
+  g.add(rbox(1.9, .3, 2.2, .05, mat.woodLight, 0, .25, 0));
+  g.add(rbox(1.8, .26, 2.05, .1, mat.white, 0, .52, .02));
+  g.add(rbox(1.86, .07, 1.25, .035, mat.green, 0, .67, .45));
+  g.add(rbox(1.86, .08, .25, .04, mat.mustard, 0, .68, -.16));
+  g.add(rbox(2.0, 1.15, .14, .07, mat.beige, 0, .7, -1.1));
+  for (let i = 0; i < 4; i++) g.add(rbox(.42, .5, .04, .06, mat.cream, -.69 + i * .46, .88, -1.02));
+  for (const sx of [-1, 1]) { const p = rbox(.62, .16, .4, .08, mat.white, sx * .42, .74, -.78); p.rotation.x = -.35; g.add(p); }
+  for (const sx of [-1, 1]) {
+    const ns = group(rbox(.5, .5, .45, .04, mat.woodLight, 0, .27, 0), rbox(.42, .015, .02, .005, mat.gold, 0, .3, .23),
+      cyl(.07, .09, .05, mat.gold, 0, .545, 0), cyl(.012, .012, .25, mat.gold, 0, .69, 0, 8));
+    const sh = new THREE.Mesh(new THREE.CylinderGeometry(.1, .15, .17, 24, 1, true), mat.lampShade); sh.position.y = .86; ns.add(sh);
+    ns.position.set(sx * 1.32, 0, -.85); g.add(ns);
+  }
+  return g;
+}
+function wardrobe() {
+  const g = new THREE.Group(), h = 2.3, w = 1.8;
+  g.add(rbox(w, .1, .62, .02, mat.woodDark, 0, .05, 0));
+  g.add(rbox(w, h, .62, .03, mat.woodLight, 0, .1 + h / 2, 0));
+  g.add(rbox(w + .08, .08, .7, .02, mat.woodDark, 0, h + .14, 0));
+  const dw = (w - .08) / 3;
+  for (let i = 0; i < 3; i++) {
+    const x = -w / 2 + .04 + dw * (i + .5);
+    g.add(rbox(dw - .025, h - .12, .03, .01, i === 1 ? mat.mirror : mat.woodLight, x, .1 + h / 2, .32));
+    if (i !== 1) g.add(cyl(.012, .012, .4, mat.gold, x + (i === 0 ? dw / 2 - .1 : -dw / 2 + .1), 1.25, .36, 10));
+  }
+  for (let i = 0; i < 2; i++) g.add(rbox(dw - .1, .015, .015, .004, mat.woodDark, -dw, .5 + i * 1.5, .34));
+  return g;
+}
+function dining() {
+  const g = new THREE.Group();
+  g.add(rbox(1.9, .07, 1.0, .03, mat.wood, 0, .76, 0));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const l = rbox(.07, .74, .07, .02, mat.woodDark, sx * .82, .37, sz * .4); g.add(l); }
+  const chair = () => group(rbox(.48, .08, .46, .03, mat.green, 0, .47, 0), rbox(.46, .52, .07, .05, mat.green, 0, .8, -.21),
+    ...[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => cyl(.022, .018, .44, mat.gold, a * .19, .22, b * .18, 10)));
+  for (const sz of [-1, 1]) for (const x of [-.5, .5]) { const c = chair(); c.position.set(x, 0, sz * .78); c.rotation.y = sz > 0 ? Math.PI : 0; g.add(c); }
+  g.add(cyl(.06, .09, .25, mat.white, 0, .92, 0), cyl(.2, .2, .02, mat.white, -.5, .805, .1, 32), cyl(.2, .2, .02, mat.white, .5, .805, -.1, 32));
+  const fruit = new THREE.Mesh(new THREE.SphereGeometry(.05, 16, 12), mat.red);
+  for (const [x, z] of [[-.04, .02], [.05, -.03], [.0, .06]]) { const f = fruit.clone(); f.position.set(.5 + x, .86, -.1 + z); g.add(f); }
+  return g;
+}
+function damas() {
+  const g = new THREE.Group(), body = M(0xfafafa, { metalness: .3, roughness: .25 });
+  g.add(rbox(3.2, 1.05, 1.42, .14, body, 0, .82, 0));
+  g.add(rbox(2.7, .78, 1.38, .16, body, -.2, 1.62, 0));
+  const ws = rbox(.06, .72, 1.22, .03, mat.glass, 1.25, 1.62, 0); ws.rotation.z = -.32; g.add(ws);
+  const nose = rbox(.5, .7, 1.42, .14, body, 1.37, .98, 0); g.add(nose);
+  for (const sz of [-1, 1]) {
+    for (let i = 0; i < 3; i++) g.add(rbox(.7, .5, .03, .03, mat.glass, -1.25 + i * .82, 1.68, sz * .69));
+    g.add(rbox(3.0, .1, .03, .01, mat.green, 0, .95, sz * .715));
+    g.add(rbox(3.0, .05, .03, .01, mat.gold, 0, .82, sz * .715));
+  }
+  g.add(rbox(.12, .25, 1.5, .05, mat.steel, 1.62, .45, 0), rbox(.12, .25, 1.5, .05, mat.steel, -1.6, .45, 0));
+  for (const sz of [-1, 1]) g.add(rbox(.05, .16, .26, .04, mat.headlight, 1.64, .92, sz * .5));
+  const wheel = () => { const w = group(cyl(.32, .32, .24, mat.rubber, 0, 0, 0, 28), cyl(.18, .18, .26, mat.steel, 0, 0, 0, 20)); w.children.forEach(c => c.rotation.x = Math.PI / 2); return w; };
+  g.userData.wheels = [];
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const w = wheel(); w.position.set(sx * 1.05, .32, sz * .62); g.add(w); g.userData.wheels.push(w); }
+  // sovg'a lentasi
+  g.add(rbox(.22, .03, 1.44, .01, mat.red, -.2, 2.02, 0), rbox(2.74, .03, .22, .01, mat.red, -.2, 2.02, 0));
+  const bowGeo = new THREE.TorusGeometry(.22, .07, 12, 32);
+  for (const s of [-1, 1]) { const b = new THREE.Mesh(bowGeo, mat.red); b.position.set(-.2 + s * .2, 2.18, 0); b.rotation.set(0, Math.PI / 2, s * .5); b.scale.set(1, .8, 1); b.castShadow = true; g.add(b); }
+  return g;
+}
+function plane() {
+  const body = M(0xffffff, { metalness: .4, roughness: .3 });
+  const f = new THREE.Mesh(new THREE.CapsuleGeometry(.22, 1.8, 8, 20), body); f.rotation.z = Math.PI / 2;
+  const g = group(f, rbox(.55, .04, 2.6, .02, body, .05, -.02, 0), rbox(.3, .03, .9, .01, body, -.95, .05, 0), rbox(.35, .5, .04, .02, mat.green, -.98, .3, 0));
+  for (let i = 0; i < 6; i++) g.add(rbox(.08, .07, .02, .01, mat.glass, .7 - i * .22, .08, .2));
+  g.traverse(o => o.castShadow = true); return g;
+}
+function gift(s, m, rib) {
+  return group(rbox(s, s * .85, s, .03, m, 0, s * .425, 0), rbox(s * 1.02, s * .12, s * 1.02, .02, m, 0, s * .85, 0),
+    rbox(s * .16, s * .9, s * 1.04, .01, rib, 0, s * .45, 0), rbox(s * 1.04, s * .9, s * .16, .01, rib, 0, s * .45, 0),
+    ...[-1, 1].map(k => { const b = new THREE.Mesh(new THREE.TorusGeometry(s * .14, s * .045, 10, 24), rib); b.position.set(k * s * .12, s * .97, 0); b.rotation.set(0, 0, k * .7); return b; }));
+}
+function podium(r = 2.4) {
+  const g = group(cyl(r, r + .05, .3, mat.podium, 0, -.15, 0, 72));
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(r, .03, 10, 96), mat.gold); rim.rotation.x = Math.PI / 2; g.add(rim);
+  return g;
+}
+
+// ---------- scenes ----------
+const S = {};
+// 1: eski -> yangi divan
+S.s1 = group(podium(2.2)); S.oldSofa = sofa({ fabric: mat.oldFabric, cushion: mat.oldFabric, legs: mat.oldWood, old: true });
+S.newSofa = sofa(); S.s1.add(S.oldSofa, S.newSofa);
+// 2: mehmonxona
+S.s2 = group(podium(2.6), cyl(1.9, 1.9, .012, mat.rug, 0, .006, 0, 64));
+{ const sf = sofa(); sf.position.set(0, 0, -.75); const ar = sofa({ w: 1.05, seats: 1, fabric: mat.beige, cushion: mat.cream, accent: mat.green });
+  ar.position.set(1.45, 0, .5); ar.rotation.y = -1.1; const ct = coffeeTable(); ct.position.set(-.1, 0, .45);
+  const pl = plant(1.1); pl.position.set(-1.7, 0, -.7); const lp = floorLamp(); lp.position.set(1.6, 0, -.9); S.s2.add(sf, ar, ct, pl, lp); }
+// 3: 0-0-12 3D matn
+S.s3 = new THREE.Group(); S.text3d = new THREE.Group(); S.s3.add(S.text3d);
+S.s3gifts = [gift(.5, mat.green, mat.gold), gift(.38, mat.red, mat.gold), gift(.44, mat.white, mat.green)];
+S.s3gifts.forEach(g => S.s3.add(g));
+// 4: mahsulotlar
+S.s4 = group(podium(2.5));
+S.products = [sofa({ fabric: mat.beige, cushion: mat.cream, accent: mat.green }), bed(), wardrobe(), dining()];
+S.products.forEach(p => S.s4.add(p));
+// 5: sovrinlar
+S.s5 = group(podium(2.5)); S.van = damas(); S.plane = plane();
+S.s5gifts = [gift(.55, mat.red, mat.gold), gift(.42, mat.green, mat.gold), gift(.36, mat.gold, mat.red)];
+S.s5.add(S.van, S.plane, ...S.s5gifts);
+// 6: to'liq xona
+S.s6 = group(podium(3.0), cyl(2.0, 2.0, .012, mat.rug, 0, .006, .2, 64));
+{ const sf = sofa(); sf.position.set(0, 0, -1.0); const a1 = sofa({ w: 1.05, seats: 1, fabric: mat.beige, cushion: mat.cream, accent: mat.green });
+  a1.position.set(-1.6, 0, .55); a1.rotation.y = 1.15; const a2 = a1.clone(); a2.position.x = 1.6; a2.rotation.y = -1.15;
+  const ct = coffeeTable(); ct.position.set(0, 0, .35); const pl = plant(1.2); pl.position.set(-2.1, 0, -1.2); const lp = floorLamp(); lp.position.set(2.05, 0, -1.25);
+  S.s6.add(sf, a1, a2, ct, pl, lp); }
+const sceneGroups = [S.s1, S.s2, S.s3, S.s4, S.s5, S.s6];
+sceneGroups.forEach(g => { g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); scene.add(g); });
+
+// sparkles
+const sparkGeo = new THREE.OctahedronGeometry(.06, 0);
+const sparkMat = new THREE.MeshBasicMaterial({ color: 0xffe08a });
+const sparks = []; for (let i = 0; i < 40; i++) { const m = new THREE.Mesh(sparkGeo, sparkMat); scene.add(m);
+  sparks.push({ m, a: Math.random() * 6.28, r: 1.2 + Math.random() * 1.8, y: Math.random() * 2.4, sp: .3 + Math.random() * .8, ph: Math.random() * 6.28 }); }
+
+const fontReady = new Promise(res => new FontLoader().load('./lib/helvetiker_bold.typeface.json', font => {
+  const geo = new TextGeometry('0-0-12', { font, size: .62, height: .22, curveSegments: 8, bevelEnabled: true, bevelThickness: .05, bevelSize: .035, bevelSegments: 4 });
+  geo.computeBoundingBox(); geo.center();
+  const m = new THREE.Mesh(geo, [mat.gold, M(0xc9902a, { metalness: 1, roughness: .35 })]); m.castShadow = true; S.text3d.add(m); res();
+}));
+
+// ---------- timeline ----------
+function setCam(px, py, pz, lx, ly, lz) { camera.position.set(px, py, pz); camera.lookAt(lx, ly, lz); }
+const els = [...document.querySelectorAll('.el')].map(e => ({ e, a: +e.dataset.in, b: +e.dataset.out, fx: e.dataset.fx }));
+const flash = document.getElementById('flash'), rays = document.getElementById('rays');
+const CUTS = [5, 10, 16.5, 25, 30];
+
+function renderAt(t) {
+  sceneGroups.forEach(g => g.visible = false);
+  sparks.forEach(s => s.m.visible = false);
+  const showSparks = (cx, cy, cz, k = 1) => sparks.forEach(s => { s.m.visible = k > .02;
+    const a = s.a + t * s.sp; s.m.position.set(cx + Math.cos(a) * s.r, cy + s.y + Math.sin(t * 2 + s.ph) * .15, cz + Math.sin(a) * s.r * .6);
+    s.m.scale.setScalar(k * (.6 + .5 * Math.sin(t * 6 + s.ph))); s.m.rotation.set(t * 2 + s.ph, t * 3, 0); });
+
+  if (t < 5) {                                   // 1
+    S.s1.visible = true;
+    const swap = prog(t, 3.2, .7);
+    S.oldSofa.visible = swap < 1;
+    S.oldSofa.rotation.set(0, Math.sin(t * 1.3) * .25 + swap * 4, .035 + Math.sin(t * 9) * .012 * (t > 2 ? 1 : 0));
+    S.oldSofa.scale.setScalar(1 - easeInOut(swap)); S.oldSofa.position.y = swap * 1.2;
+    const drop = prog(t, 3.8, .9); S.newSofa.visible = t > 3.8;
+    S.newSofa.position.y = (1 - bounce(drop)) * 4; S.newSofa.rotation.y = -.5 + Math.sin(t * .8) * .25 + (1 - drop) * 1.2;
+    if (t > 4) showSparks(0, 0, 0, easeOut(prog(t, 4, .5)));
+    setCam(0, 2.4, 8.6 - t * .25, 0, .9, 0);
+  } else if (t < 10) {                           // 2
+    S.s2.visible = true; S.s2.rotation.y = -.6 + (t - 5) * .22;
+    S.s2.position.y = -(1 - easeOut(prog(t, 5, .8))) * 2;
+    setCam(0, 3.6, 9.6 - (t - 5) * .2, 0, .4, 0);
+  } else if (t < 16.5) {                         // 3
+    S.s3.visible = true; const p = easeBack(prog(t, 10.3, 1.0));
+    S.text3d.scale.setScalar(Math.max(.001, p)); S.text3d.rotation.set(.12, (1 - p) * 3 + Math.sin(t * 1.2) * .22, 0);
+    S.text3d.position.set(0, 2.4 + Math.sin(t * 2) * .05, 0);
+    S.s3gifts.forEach((g, i) => { const a = t * .7 + i * 2.09; g.position.set(Math.cos(a) * 1.9, 2.4 + Math.sin(a * 1.3) * .6, Math.sin(a) * .9 - 1.3);
+      g.rotation.set(Math.sin(t + i) * .4, t * (1 + i * .3), .2); g.scale.setScalar(easeBack(prog(t, 10.8 + i * .2, .6))); });
+    showSparks(0, 2.0, 0, .9);
+    setCam(0, 3.0, 10, 0, .9, 0);
+  } else if (t < 25) {                           // 4
+    S.s4.visible = true; const seg = 2.1, start = 16.6;
+    S.products.forEach((p, i) => {
+      const lt = t - start - i * seg; p.visible = lt > -.4 && lt < seg + .4;
+      const inP = easeOut(prog(lt, -.4, .7)), outP = easeInOut(prog(lt, seg - .3, .6));
+      p.position.set((1 - inP) * 6 - outP * 6, 0, 0); p.rotation.y = -.55 + lt * .5 + (1 - inP) * -1.2;
+      const sc = i === 2 ? .95 : 1; p.scale.setScalar(sc);
+    });
+    S.s4.rotation.y = 0; showSparks(0, 0, 0, .5);
+    setCam(0, 3.3, 9.4, 0, .9, 0);
+  } else if (t < 30) {                           // 5
+    S.s5.visible = true; const vin = easeOut(prog(t, 25, 1.1));
+    S.van.position.set((1 - vin) * -7, 0, .1); S.van.rotation.y = -.35 - (t - 25) * .28 * vin; S.van.scale.setScalar(.8);
+    S.van.userData.wheels.forEach(w => w.rotation.z = -(1 - vin) * 20);
+    const pt = prog(t, 25.6, 4.2); S.plane.position.set(-4 + pt * 8, 3.6 + Math.sin(pt * 3.14) * .5, -2.4); S.plane.rotation.set(.15, 0, .12 + Math.sin(pt * 6) * .05);
+    S.plane.visible = pt > 0 && pt < 1;
+    const gp = [[-1.75, .9], [1.8, .7], [1.4, -.1 - 1.2]];
+    S.s5gifts.forEach((g, i) => { const k = easeBack(prog(t, 25.8 + i * .25, .6)); g.scale.setScalar(Math.max(.001, k));
+      g.position.set(gp[i][0], Math.abs(Math.sin(t * 3 + i)) * .25, i === 2 ? -1.3 : gp[i][1]); g.rotation.y = t * .6 + i; });
+    showSparks(0, .3, 0, .8);
+    setCam(0, 3.4, 10.2, 0, .45, 0);
+  } else {                                       // 6
+    S.s6.visible = true; const a = -.5 + (t - 30) * .12;
+    S.s6.position.y = -(1 - easeOut(prog(t, 30, .9))) * 2;
+    setCam(Math.sin(a) * 11.5, 4.2, Math.cos(a) * 11.5, 0, -.45, 0);
+    showSparks(0, .3, 0, .5);
+  }
+  rays.style.transform = `rotate(${t * 6}deg)`;
+  // flash at cuts
+  let f = 0; for (const c of CUTS) f = Math.max(f, 1 - Math.abs(t - c) / .18); flash.style.opacity = clamp(f) * .85;
+  // overlay text
+  for (const { e, a, b, fx } of els) {
+    if (t < a || t >= b) { e.style.opacity = 0; continue; }
+    const pin = prog(t, a, .5), pout = prog(t, b - .3, .3);
+    let tr = '';
+    if (fx === 'up') tr = `translateY(${(1 - easeOut(pin)) * 70}px)`;
+    if (fx === 'pop') tr = `scale(${Math.max(0, easeBack(pin))})`;
+    if (fx === 'left') tr = `translateX(${(1 - easeOut(pin)) * -260}px)`;
+    e.style.transform = tr; e.style.opacity = clamp(pin * 1.6) * (1 - pout);
+  }
+  renderer.render(scene, camera);
+}
+window.renderAt = renderAt;
+window.ready = fontReady.then(() => document.fonts.ready).then(() => { renderAt(0); return true; });
+if (!navigator.webdriver) fontReady.then(() => { const t0 = performance.now(); const loop = () => { renderAt(((performance.now() - t0) / 1000) % 36); requestAnimationFrame(loop); }; loop(); });
+</script>
+</body>
+</html>

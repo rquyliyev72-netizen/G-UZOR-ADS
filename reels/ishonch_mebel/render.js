@@ -1,0 +1,58 @@
+// ISHONCH mebel reel renderer: index.html (Three.js) -> kadrlar -> MP4 (ffmpeg).
+// Ishga tushirish:
+//   node render.js                      -> ishonch_mebel_reel.mp4 (36s, 30fps, 1080x1920, musiqa bilan)
+//   node render.js --preview 1,4.5,8    -> preview_<t>.png kadrlar
+// Talab: playwright (chromium), ffmpeg, python3 + numpy (musiqa uchun).
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { spawn, execFileSync } = require('child_process');
+const { chromium } = require('playwright');
+
+const DIR = __dirname, FPS = 30, DURATION = 36;
+const OUT = path.join(DIR, 'ishonch_mebel_reel.mp4');
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json' };
+
+const server = http.createServer((req, res) => {
+  const p = path.join(DIR, decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html');
+  if (!p.startsWith(DIR) || !fs.existsSync(p)) { res.writeHead(404); return res.end(); }
+  res.writeHead(200, { 'Content-Type': TYPES[path.extname(p)] || 'application/octet-stream' });
+  fs.createReadStream(p).pipe(res);
+});
+
+(async () => {
+  await new Promise(r => server.listen(0, r));
+  const url = `http://127.0.0.1:${server.address().port}/index.html`;
+  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+  page.on('pageerror', e => console.error('PAGE ERROR', e));
+  await page.goto(url);
+  await page.evaluate(() => window.ready);
+
+  const pi = process.argv.indexOf('--preview');
+  if (pi > 0) {
+    for (const t of process.argv[pi + 1].split(',').map(Number)) {
+      await page.evaluate(t => window.renderAt(t), t);
+      await page.screenshot({ path: path.join(DIR, `preview_${t}.png`) });
+      console.log('preview', t);
+    }
+  } else {
+    const music = path.join(DIR, 'music.wav');
+    execFileSync('python3', [path.join(DIR, 'music.py'), music, String(DURATION)], { stdio: 'inherit' });
+    const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
+      '-i', music, '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
+      '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', OUT], { stdio: ['pipe', 'inherit', 'inherit'] });
+    const N = FPS * DURATION, t0 = Date.now();
+    for (let i = 0; i < N; i++) {
+      await page.evaluate(t => window.renderAt(t), i / FPS);
+      const buf = await page.screenshot({ type: 'jpeg', quality: 93 });
+      if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
+      if (i % 60 === 0) console.log(`kadr ${i}/${N}  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+    }
+    ff.stdin.end();
+    await new Promise(r => ff.on('close', r));
+    fs.unlinkSync(music);
+    console.log('Tayyor:', OUT);
+  }
+  await browser.close(); server.close();
+})().catch(e => { console.error(e); process.exit(1); });
