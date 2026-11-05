@@ -40,6 +40,15 @@ jobs:
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
             echo "KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          else
+            # Secrets yo'q: vaqtinchalik test kaliti yaratiladi
+            keytool -genkeypair -v -keystore "$RUNNER_TEMP/test.jks" -alias test \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass testpass -keypass testpass -dname "CN=Guzorda Ishla, C=UZ"
+            {
+              echo "KEYSTORE_FILE=$RUNNER_TEMP/test.jks"
+              echo "TEST_KEYSTORE=1"
+            } >> "$GITHUB_ENV"
           fi
 
       - name: APK yig'ish
@@ -49,6 +58,9 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          if [ "$TEST_KEYSTORE" = "1" ]; then
+            export KEYSTORE_PASSWORD=testpass KEY_ALIAS=test KEY_PASSWORD=testpass
+          fi
           gradle assembleRelease --no-daemon --stacktrace
           mkdir -p ../dist
           cp app/build/outputs/apk/release/app-release.apk ../dist/GuzordaIshla-v1.0.${{ github.run_number }}.apk
