@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """Reel uchun oddiy, quvnoq fon musiqasi (sintez): akkordlar, pluck, baraban, o'tish 'whoosh'lari.
-Ishlatish: python3 music.py chiqish.wav [davomiylik_s]"""
-import sys, wave
+Ishlatish: python3 music.py chiqish.wav timeline.json"""
+import json, sys, wave
 import numpy as np
 
 SR = 44100
-out = sys.argv[1]; dur = float(sys.argv[2]) if len(sys.argv) > 2 else 36.0
+out = sys.argv[1]; tl = json.load(open(sys.argv[2])); dur = tl['duration']
+ORIG, ST = tl['orig'], tl['starts']
+def unwarp(x):  # asl (index.html) vaqtini yangi vaqtga o'tkazish
+    for i in range(6):
+        if x < ORIG[i + 1]: return ST[i] + (x - ORIG[i]) / (ORIG[i + 1] - ORIG[i]) * (ST[i + 1] - ST[i])
+    return ST[-1]
 n = int(SR * dur); t = np.arange(n) / SR
 mix = np.zeros(n); rng = np.random.default_rng(7)
 BPM = 116; beat = 60 / BPM; bar = beat * 4
@@ -43,12 +48,12 @@ for b in range(nb):
             i0 = int((t0 + k*beat) * SR); m = min(int(.12*SR), n - i0)
             if m > 0: mix[i0:i0+m] += .12*rng.standard_normal(m)*np.exp(-np.arange(m)/SR*30)
 
-for c in (5, 10, 16.5, 25, 30):  # whoosh
+for c in ST[1:-1]:  # whoosh
     i0 = int((c - .45) * SR); m = int(.6*SR); tt = np.arange(m)/SR
     noise = np.convolve(rng.standard_normal(m), np.ones(12)/12, 'same')
     mix[i0:i0+m] += .25 * noise * np.sin(np.pi*tt/.6) ** 2
 for c in (4.0, 5.6, 10.3, 12.0, 12.6, 13.2, 25.1, 26.6, 27.1, 27.6, 30.1):  # 'ding'
-    note(hz(88), c, .6, .08, 'pluck'); note(hz(95), c + .05, .6, .05, 'pluck')
+    c = unwarp(c); note(hz(88), c, .6, .08, 'pluck'); note(hz(95), c + .05, .6, .05, 'pluck')
 
 mix *= np.minimum(1, t/.5) * np.minimum(1, (dur - t)/1.5)
 mix = np.tanh(mix * 1.1) * .85
