@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>Men haqimda — G‘uzor Ads</title>
+<!--
+  "Men haqimda" animatsiyali video (1080x1920, 22s).
+  Brauzerda ochsangiz animatsiya o'ynaydi; MP4 ga aylantirish uchun:
+  node men_haqimda_render.js
+-->
+<style>
+:root{
+  --bg:#07111f; --card:#0d1c30; --line:#1c3048;
+  --muted:#9eacbe; --a:#00aaff; --b:#6c5ce7;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg)}
+body{font-family:Inter,"Inter Display",Arial,sans-serif;color:#fff;position:relative}
+.abs{position:absolute}
+.grad{background:linear-gradient(100deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- background ---------- */
+.bg{inset:0;background:radial-gradient(1200px 900px at 50% 40%,#0b1b31 0%,#07111f 70%)}
+.grid{inset:0;opacity:.18;
+  background-image:linear-gradient(#1c3048 1px,transparent 1px),linear-gradient(90deg,#1c3048 1px,transparent 1px);
+  background-size:90px 90px;
+  -webkit-mask-image:radial-gradient(circle at 50% 45%,#000 0%,transparent 75%);
+  animation:gridMove 22s linear both}
+@keyframes gridMove{to{background-position:0 360px,0 360px}}
+.blob{border-radius:50%;filter:blur(110px);opacity:.55}
+.blob1{width:700px;height:700px;background:#00aaff;left:-250px;top:150px;animation:b1 22s ease-in-out both}
+.blob2{width:650px;height:650px;background:#6c5ce7;right:-260px;top:1050px;animation:b2 22s ease-in-out both}
+@keyframes b1{0%{transform:translate(0,0)}25%{transform:translate(380px,250px)}50%{transform:translate(120px,900px)}75%{transform:translate(500px,400px)}100%{transform:translate(200px,100px)}}
+@keyframes b2{0%{transform:translate(0,0)}25%{transform:translate(-380px,-500px)}50%{transform:translate(-100px,-900px)}75%{transform:translate(-450px,-200px)}100%{transform:translate(-150px,-600px)}}
+.dot{width:8px;height:8px;border-radius:50%;background:#7fd4ff;opacity:0;box-shadow:0 0 14px #00aaff}
+
+/* ---------- photo (persists across scenes) ---------- */
+.photoWrap{left:540px;top:0;width:0;height:0;animation:photoMove 22s both}
+.photo{position:absolute;left:-380px;top:-430px;width:760px;height:860px;border-radius:56px;padding:8px;
+  background:linear-gradient(140deg,var(--a),var(--b));box-shadow:0 40px 120px rgba(0,170,255,.35);
+  animation:photoShape 22s both}
+.photo .inner{width:100%;height:100%;border-radius:inherit;overflow:hidden;background:#0d1c30}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:50% 25%;animation:kenburns 22s linear both}
+@keyframes kenburns{0%{transform:scale(1.18)}18%{transform:scale(1.04)}100%{transform:scale(1.08)}}
+/* position / scale timeline: 22s -> 1% = .22s */
+@keyframes photoMove{
+  0%   {transform:translate(0,880px) scale(.2);opacity:0}
+  3%   {transform:translate(0,880px) scale(.2);opacity:0}
+  7%   {transform:translate(0,820px) scale(1);opacity:1;animation-timing-function:ease-in-out}
+  16.5%{transform:translate(0,800px) scale(1);opacity:1;animation-timing-function:cubic-bezier(.7,0,.2,1)}
+  20% {transform:translate(0,330px) scale(.42);opacity:1}
+  39.5%{transform:translate(0,330px) scale(.42);opacity:1}
+  41.5%{transform:translate(0,280px) scale(.3);opacity:0}
+  84% {transform:translate(0,740px) scale(.3);opacity:0;animation-timing-function:cubic-bezier(.2,1.4,.4,1)}
+  88% {transform:translate(0,700px) scale(.62);opacity:1}
+  100%{transform:translate(0,700px) scale(.64);opacity:1}
+}
+@keyframes photoShape{
+  0%,16.5%{border-radius:56px;width:760px;height:860px;left:-380px;top:-430px}
+  20%,100%{border-radius:430px;width:860px;height:860px;left:-430px;top:-430px}
+}
+.ring{left:540px;width:0;height:0;animation:ringShow 22s both}
+.ring i{position:absolute;left:-470px;top:-470px;width:940px;height:940px;border-radius:50%;
+  border:3px dashed rgba(0,170,255,.55);animation:spin 22s linear both}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ringShow{
+  0%,16%{opacity:0;transform:translateY(330px) scale(.42)}
+  20%,39%{opacity:1;transform:translateY(330px) scale(.42)}
+  41%,84%{opacity:0;transform:translateY(700px) scale(.64)}
+  88%,100%{opacity:1;transform:translateY(700px) scale(.64)}
+}
+
+/* ---------- generic entry animations ---------- */
+@keyframes up{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.5)}70%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes fromL{from{opacity:0;transform:translateX(-220px)}to{opacity:1;transform:none}}
+@keyframes fromR{from{opacity:0;transform:translateX(220px)}to{opacity:1;transform:none}}
+@keyframes out{to{opacity:0;transform:translateY(-50px)}}
+@keyframes outS{to{opacity:0;transform:scale(.9)}}
+@keyframes growX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes growY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(18deg)}40%,80%{transform:rotate(-10deg)}}
+
+.center{left:0;right:0;text-align:center}
+
+/* ---------- scene 1 ---------- */
+.hello{top:150px;font-size:150px;font-weight:900;letter-spacing:-4px;animation:pop .8s ease-out .3s both,out .5s ease-in 3.6s forwards}
+.hello .hand{display:inline-block;transform-origin:70% 80%;animation:wave 1.4s ease-in-out .9s both}
+.s1title{top:1390px;font-size:110px;font-weight:900;letter-spacing:-3px;animation:up .7s cubic-bezier(.2,.9,.3,1) 1.3s both,out .5s ease-in 3.5s forwards}
+.s1sub{top:1540px;font-size:44px;font-weight:600;color:var(--muted);animation:up .7s ease-out 1.8s both,out .5s ease-in 3.5s forwards}
+.s1sub b{color:#fff}
+.bar{top:1650px;left:390px;width:300px;height:8px;border-radius:8px;background:linear-gradient(90deg,var(--a),var(--b));transform-origin:left;
+  animation:growX .7s ease-out 2.1s both,out .5s ease-in 3.5s forwards}
+
+/* ---------- scene 2: roles ---------- */
+.s2title{top:720px;font-size:84px;font-weight:900;letter-spacing:-2px;animation:up .7s ease-out 4.4s both,out .5s ease-in 8.6s forwards}
+.role{left:90px;width:900px;height:250px;border-radius:40px;background:rgba(13,28,48,.85);border:2px solid var(--line);
+  display:flex;align-items:center;gap:44px;padding:0 50px;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.role .ic{flex:none;width:150px;height:150px;border-radius:36px;display:grid;place-items:center;background:linear-gradient(140deg,var(--a),var(--b))}
+.role .ic svg{width:88px;height:88px}
+.role h3{font-size:70px;font-weight:900;letter-spacing:-1.5px;line-height:1.05}
+.role p{font-size:34px;color:var(--muted);font-weight:500;margin-top:10px}
+.r1{top:880px;animation:fromL .7s cubic-bezier(.2,.9,.3,1.1) 4.9s both,out .45s ease-in 8.5s forwards}
+.r2{top:1170px;animation:fromR .7s cubic-bezier(.2,.9,.3,1.1) 5.5s both,out .45s ease-in 8.6s forwards}
+.r3{top:1460px;animation:fromL .7s cubic-bezier(.2,.9,.3,1.1) 6.1s both,out .45s ease-in 8.7s forwards}
+.check{position:absolute;right:46px;top:50%;margin-top:-34px;width:68px;height:68px;border-radius:50%;background:#12c27e;display:grid;place-items:center}
+.check svg{width:40px;height:40px}
+.r1 .check{animation:pop .5s ease-out 6.9s both}
+.r2 .check{animation:pop .5s ease-out 7.2s both}
+.r3 .check{animation:pop .5s ease-out 7.5s both}
+
+/* ---------- scene 3: services ---------- */
+.s3kicker{top:260px;font-size:40px;font-weight:700;letter-spacing:10px;color:var(--a);animation:up .6s ease-out 9.2s both,out .5s ease-in 14.3s forwards}
+.s3title{top:330px;font-size:86px;white-space:nowrap;font-weight:900;letter-spacing:-3px;animation:up .7s ease-out 9.4s both,out .5s ease-in 14.3s forwards}
+.svc{left:80px;width:920px;border-radius:48px;padding:56px 56px 60px;overflow:hidden}
+.svc1{top:560px;height:560px;background:linear-gradient(150deg,#1d9bf0 0%,#0a6fd1 60%,#0b4fa8 100%);box-shadow:0 40px 100px rgba(0,140,255,.4);
+  animation:pop .8s ease-out 10.0s both,outS .5s ease-in 14.2s forwards}
+.svc2{top:1170px;height:560px;background:linear-gradient(150deg,#7b6cf0 0%,#5a48d6 60%,#3d2fb0 100%);box-shadow:0 40px 100px rgba(108,92,231,.4);
+  animation:pop .8s ease-out 11.4s both,outS .5s ease-in 14.3s forwards}
+.svc .num{font-size:34px;font-weight:800;opacity:.75;letter-spacing:4px}
+.svc h3{font-size:96px;font-weight:900;letter-spacing:-3px;line-height:1;margin-top:20px}
+.svc p{font-size:36px;font-weight:500;opacity:.9;margin-top:22px;max-width:560px;line-height:1.35}
+.svc .big{position:absolute;right:-40px;bottom:-40px;width:330px;height:330px;opacity:.95}
+.svc1 .big{animation:fly 1s cubic-bezier(.2,.9,.3,1) 10.5s both}
+@keyframes fly{from{opacity:0;transform:translate(-300px,200px) rotate(-25deg) scale(.6)}to{opacity:.95;transform:none}}
+.svc2 .big{animation:pop .8s ease-out 11.9s both}
+.chips{display:flex;flex-wrap:wrap;gap:16px;margin-top:34px;max-width:620px}
+.chip{font-size:30px;font-weight:700;padding:14px 26px;border-radius:40px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.3)}
+.svc1 .chip:nth-child(1){animation:up .45s ease-out 11.0s both}
+.svc1 .chip:nth-child(2){animation:up .45s ease-out 11.15s both}
+.svc1 .chip:nth-child(3){animation:up .45s ease-out 11.3s both}
+.svc2 .chip:nth-child(1){animation:up .45s ease-out 12.3s both}
+.svc2 .chip:nth-child(2){animation:up .45s ease-out 12.45s both}
+.svc2 .chip:nth-child(3){animation:up .45s ease-out 12.6s both}
+.svc2 .chip:nth-child(4){animation:up .45s ease-out 12.75s both}
+
+/* ---------- scene 4: process ---------- */
+.s4title{top:300px;font-size:96px;font-weight:900;letter-spacing:-2.5px;line-height:1.05;animation:up .7s ease-out 14.8s both,out .5s ease-in 18.1s forwards}
+.line{left:205px;top:700px;width:6px;height:820px;border-radius:6px;background:linear-gradient(var(--a),var(--b));transform-origin:top;
+  animation:growY 2.2s ease-in-out 15.3s both,out .5s ease-in 18.1s forwards}
+.step{left:140px;display:flex;align-items:center;gap:56px}
+.step .n{width:136px;height:136px;border-radius:50%;background:var(--bg);border:6px solid var(--a);display:grid;place-items:center;font-size:56px;font-weight:900;flex:none}
+.step h4{font-size:66px;font-weight:900;letter-spacing:-1.5px}
+.step p{font-size:34px;color:var(--muted);font-weight:500;margin-top:4px}
+.st1{top:630px;animation:fromR .6s ease-out 15.4s both,out .45s ease-in 18.0s forwards}
+.st2{top:900px;animation:fromR .6s ease-out 16.0s both,out .45s ease-in 18.05s forwards}
+.st3{top:1170px;animation:fromR .6s ease-out 16.6s both,out .45s ease-in 18.1s forwards}
+.st4{top:1440px;animation:fromR .6s ease-out 17.2s both,out .45s ease-in 18.15s forwards}
+.st4 .n{background:linear-gradient(140deg,var(--a),var(--b));border-color:transparent}
+
+/* ---------- scene 5: CTA ---------- */
+.s5title{top:150px;font-size:92px;font-weight:900;letter-spacing:-2.5px;line-height:1.08;animation:up .7s ease-out 18.7s both}
+.brand{top:1075px;font-size:46px;font-weight:800;letter-spacing:8px;color:var(--muted);animation:up .6s ease-out 19.5s both}
+.btn{left:110px;width:860px;height:150px;border-radius:80px;display:flex;align-items:center;justify-content:center;gap:28px;font-size:54px;font-weight:800}
+.btn svg{width:62px;height:62px}
+.btn1{top:1200px;background:linear-gradient(100deg,#1d9bf0,var(--b));box-shadow:0 30px 80px rgba(0,170,255,.45);animation:pop .7s ease-out 19.9s both,pulse 1.2s ease-in-out 20.8s 2}
+.btn2{top:1380px;background:rgba(13,28,48,.9);border:3px solid var(--line);animation:pop .7s ease-out 20.3s both}
+.foot{top:1640px;font-size:38px;font-weight:600;color:var(--muted);animation:up .6s ease-out 20.8s both}
+.foot b{color:#fff}
+</style>
+</head>
+<body>
+<div class="abs bg"></div>
+<div class="abs grid"></div>
+<div class="abs blob blob1"></div>
+<div class="abs blob blob2"></div>
+<div id="dots"></div>
+
+<!-- photo -->
+<div class="abs ring"><i></i></div>
+<div class="abs photoWrap"><div class="photo"><div class="inner"><img src="men_haqimda_photo.jpg" alt=""></div></div></div>
+
+<!-- Scene 1 -->
+<div class="abs center hello">Salom! <span class="hand">👋</span></div>
+<div class="abs center s1title">Men <span class="grad">haqimda</span></div>
+<div class="abs center s1sub">Raqamli marketing · <b>G‘uzor Ads</b></div>
+<div class="abs bar"></div>
+
+<!-- Scene 2 -->
+<div class="abs center s2title">Men qiladigan <span class="grad">ishlar</span></div>
+<div class="abs role r1">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="#fff"/><path d="M15 9l6-6M18 3h3v3"/></svg></div>
+  <div><h3>Targetolog</h3><p>Reklama to‘g‘ri auditoriyaga</p></div>
+  <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+</div>
+<div class="abs role r2">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 100 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1.1 0-.9.7-1.6 1.6-1.6H16a5 5 0 005-5C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2" fill="#fff"/><circle cx="10.5" cy="7" r="1.2" fill="#fff"/><circle cx="15.5" cy="7.5" r="1.2" fill="#fff"/></svg></div>
+  <div><h3>Dizayner</h3><p>Esda qoladigan vizual uslub</p></div>
+  <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+</div>
+<div class="abs role r3">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M3 9l1.5-5 17 2.5L20 9"/><path d="M8 4.6L9.6 8.6M13.5 5.4l1.6 3.9"/><path d="M10.5 13v5l4-2.5z" fill="#fff"/></svg></div>
+  <div><h3>Montajyor</h3><p>Dinamik video va Reels montaj</p></div>
+  <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+</div>
+
+<!-- Scene 3 -->
+<div class="abs center s3kicker">XIZMATLARIM</div>
+<div class="abs center s3title">Nima <span class="grad">taklif qilaman?</span></div>
+<div class="abs svc svc1">
+  <div class="num">01</div>
+  <h3>Telegram Ads</h3>
+  <p>Telegram kanallarda rasmiy reklama — mijozlaringiz aynan o‘sha yerda</p>
+  <div class="chips"><span class="chip">Sozlash</span><span class="chip">Matn va kreativ</span><span class="chip">Tahlil</span></div>
+  <svg class="big" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="rgba(255,255,255,.18)"/><path fill="#fff" d="M5.4 11.6l11.6-4.5c.5-.2 1 .1.8.9l-2 9.3c-.1.6-.5.8-1.1.5l-3-2.2-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.1 5.6-5.1c.2-.2 0-.3-.4-.1l-6.9 4.4-3-.9c-.6-.2-.7-.6.3-.9z"/></svg>
+</div>
+<div class="abs svc svc2">
+  <div class="num">02</div>
+  <h3>SMM xizmatlari</h3>
+  <p>Sahifangizni professional yuritish va brendingizni o‘stirish</p>
+  <div class="chips"><span class="chip">Kontent reja</span><span class="chip">Dizayn</span><span class="chip">Reels</span><span class="chip">Target</span></div>
+  <svg class="big" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="12" fill="rgba(255,255,255,.18)" stroke="none"/><path d="M6 16.5l4-4 3 3 5-6"/><path d="M14.5 9.5H18V13"/></svg>
+</div>
+
+<!-- Scene 4 -->
+<div class="abs center s4title">Qanday <span class="grad">ishlayman?</span></div>
+<div class="abs line"></div>
+<div class="abs step st1"><div class="n">1</div><div><h4>Tahlil</h4><p>Biznesingiz va auditoriyangizni o‘rganaman</p></div></div>
+<div class="abs step st2"><div class="n">2</div><div><h4>Strategiya</h4><p>Aniq reja va byudjet tuzaman</p></div></div>
+<div class="abs step st3"><div class="n">3</div><div><h4>Kontent + reklama</h4><p>Dizayn, montaj va target</p></div></div>
+<div class="abs step st4"><div class="n">4</div><div><h4>Natija</h4><p>Ko‘proq mijoz va sotuv</p></div></div>
+
+<!-- Scene 5 -->
+<div class="abs center s5title">Biznesingizni<br><span class="grad">birga o‘stiramiz!</span></div>
+<div class="abs center brand">G‘UZOR ADS</div>
+<div class="abs btn btn1">
+  <svg viewBox="0 0 24 24"><path fill="#fff" d="M2.6 11.3L20.3 4.5c.8-.3 1.6.2 1.3 1.4l-3 14.2c-.2 1-.8 1.2-1.7.8l-4.6-3.4-2.2 2.1c-.2.2-.5.4-.9.4l.3-4.7 8.6-7.8c.4-.3-.1-.5-.6-.2L6.9 14l-4.6-1.4c-1-.3-1-1 .3-1.3z"/></svg>
+  @GuzorAds
+</div>
+<div class="abs btn btn2">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#00aaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.4 1.8.7 2.7a2 2 0 01-.5 2.1L8 9.8a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.7.7a2 2 0 011.7 2z"/></svg>
+  +998 95 008 35 07
+</div>
+<div class="abs center foot">Bepul maslahat uchun <b>yozing!</b></div>
+
+<script>
+// floating particles (deterministic)
+(function(){
+  let s=7; const r=()=>((s=(s*9301+49297)%233280)/233280);
+  const box=document.getElementById('dots'); let css='';
+  for(let i=0;i<26;i++){
+    const d=document.createElement('div'); d.className='abs dot';
+    const x=r()*1080, y=900+r()*1100, dur=6+r()*6, del=r()*16, sz=4+r()*8;
+    d.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;animation:fl${i} ${dur}s linear ${del}s both`;
+    css+=`@keyframes fl${i}{0%{opacity:0;transform:translateY(0)}15%{opacity:.8}85%{opacity:.6}100%{opacity:0;transform:translateY(-${600+r()*500}px)}}`;
+    box.appendChild(d);
+  }
+  const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
+})();
+// used by the renderer: seek every animation to time t (seconds)
+window.seek=t=>document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000});
+</script>
+</body>
+</html>
