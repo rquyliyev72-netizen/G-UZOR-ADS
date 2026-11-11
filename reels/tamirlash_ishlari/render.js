@@ -6,7 +6,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { spawn, execFileSync } = require('child_process');
 const { chromium } = require('playwright');
 
-const DIR = __dirname, FPS = 30, DURATION = 27;
+const DIR = __dirname, FPS = 30, DURATION = 25;
 const OUT = path.join(DIR, 'tamirlash_ishlari_reel.mp4');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.png': 'image/png' };
 const server = http.createServer((req, res) => {

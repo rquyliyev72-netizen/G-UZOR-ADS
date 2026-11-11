@@ -40,10 +40,10 @@ for b in range(int(dur / bar) + 1):
         if k in (1, 3): add(.1 * rng.standard_normal(int(.12 * SR)) * np.exp(-np.arange(int(.12 * SR)) / SR * 30), t0 + k * beat)
 
 for i in range(4): add(tone(1250, .16, .16, 'beep'), .15 + i * .42)          # ogohlantirish signali
-for c in (4.15, 8.15, 12.65, 17.15, 22.15):                                 # o'tish "whoosh"
+for c in (4.5, 9.5, 14.5, 20.0):                                 # o'tish "whoosh"
     m = int(.6 * SR); tt = np.arange(m) / SR
     add(.22 * np.convolve(rng.standard_normal(m), np.ones(12) / 12, 'same') * np.sin(np.pi * tt / .6) ** 2, c - .4)
-for c in (17.8, 18.3, 18.8, 19.3): add(tone(hz(86), .4, .06, 'pluck'), c)    # MFY chiqqanda "ding"
+for c in (16.0, 16.45, 16.9, 17.35): add(tone(hz(86), .4, .06, 'pluck'), c)    # MFY chiqqanda "ding"
 
 mix *= np.minimum(1, t / .3) * np.minimum(1, (dur - t) / 1.5)
 pcm = (np.tanh(mix * 1.1) * .85 * 32767).astype(np.int16)

@@ -2,102 +2,111 @@
 <html lang="uz">
 <head>
 <meta charset="utf-8">
-<title>Taʼmirlash ishlari — Gʻuzor</title>
+<title>Taʼmirlash ishlari — Gʻuzor yangiliklari</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0c0f13; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0d1230; }
   body { font-family: 'Inter', 'Noto Color Emoji', sans-serif; color: #fff; }
-  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #0c0f13; }
-  .ph { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
-  .ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
-  #shade { position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(8,10,14,.88) 0%, rgba(8,10,14,.35) 30%, rgba(8,10,14,.15) 50%, rgba(8,10,14,.55) 68%, rgba(8,10,14,.92) 100%); }
-  #vignette { position: absolute; inset: 0; box-shadow: inset 0 0 220px rgba(0,0,0,.65); }
-  .hazard { position: absolute; left: 0; right: 0; height: 34px;
-    background: repeating-linear-gradient(-45deg, #ffcc00 0 34px, #14171c 34px 68px); }
-  #hz-top { top: 0; } #hz-bot { bottom: 0; }
-  .el { position: absolute; left: 0; right: 0; text-align: center; opacity: 0; will-change: transform, opacity; }
-  .shadow { text-shadow: 0 6px 26px rgba(0,0,0,.7); }
-  .yellow { color: #ffcc00; }
-  .t-huge { font-weight: 900; font-size: 168px; letter-spacing: -4px; line-height: 1; }
-  .t-xl { font-weight: 900; font-size: 100px; letter-spacing: -2px; line-height: 1.02; }
-  .t-l { font-weight: 900; font-size: 72px; letter-spacing: -1px; line-height: 1.08; }
-  .t-m { font-weight: 800; font-size: 52px; line-height: 1.18; }
-  .t-s { font-weight: 700; font-size: 40px; line-height: 1.28; }
-  .pill { display: inline-block; padding: 18px 40px; border-radius: 22px; background: #e02424; color: #fff; font-weight: 900;
-    font-size: 54px; letter-spacing: 1px; box-shadow: 0 14px 40px rgba(224,36,36,.45); }
-  .pill.y { background: #ffcc00; color: #14171c; box-shadow: 0 14px 40px rgba(255,204,0,.35); }
-  .card { display: inline-block; margin: 0 60px; padding: 34px 50px; border-radius: 36px; background: rgba(12,15,19,.82);
-    border: 4px solid #ffcc00; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-  .label { font-weight: 800; font-size: 34px; letter-spacing: 6px; color: #ffcc00; }
-  .alert { display: inline-flex; width: 230px; height: 230px; border-radius: 50%; align-items: center; justify-content: center;
-    background: #e02424; font-size: 130px; box-shadow: 0 0 0 0 rgba(224,36,36,.6); }
-  .chips { display: flex; flex-direction: column; align-items: center; gap: 22px; }
-  .chip { display: flex; align-items: center; gap: 22px; width: 820px; padding: 24px 34px; border-radius: 26px;
-    background: rgba(255,255,255,.96); color: #14171c; font-weight: 900; font-size: 58px; text-align: left; box-shadow: 0 14px 34px rgba(0,0,0,.4); }
-  .chip i { font-style: normal; display: inline-flex; width: 76px; height: 76px; border-radius: 18px; background: #14171c;
-    align-items: center; justify-content: center; font-size: 44px; }
-  .chip small { margin-left: auto; font-size: 34px; font-weight: 800; color: #6b7280; }
-  .time { display: flex; align-items: center; justify-content: center; gap: 30px; }
-  .time b { font-weight: 900; font-size: 130px; letter-spacing: -3px; color: #fff; }
-  .time span { font-size: 90px; color: #ffcc00; font-weight: 900; }
-  .bar { width: 820px; height: 26px; margin: 26px auto 0; border-radius: 13px; background: rgba(255,255,255,.18); overflow: hidden; }
-  .bar div { height: 100%; width: 0; background: repeating-linear-gradient(-45deg, #ffcc00 0 22px, #f2a900 22px 44px); }
-  .row { display: flex; justify-content: space-between; gap: 30px; font-size: 42px; font-weight: 800; text-align: left; padding: 10px 0; }
-  .row span:first-child { color: #ffcc00; }
-  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
-  #redflash { position: absolute; inset: 0; background: #e02424; opacity: 0; mix-blend-mode: multiply; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  .scene { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+  .full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+  .fade-b::after { content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(5,8,25,.55) 0%, rgba(5,8,25,0) 16%, rgba(5,8,25,0) 42%, rgba(5,8,25,.75) 66%, rgba(5,8,25,.95) 100%); }
+  .bg-navy { position: absolute; inset: 0; background: radial-gradient(120% 60% at 50% 0%, #26306b 0%, #141a45 45%, #0b0f2c 100%); }
+  .bg-purple { position: absolute; inset: 0; background: linear-gradient(180deg, #151b4d 0%, #2a2a8f 45%, #6b2bd6 100%); }
+  .bg-dark { position: absolute; inset: 0; background: linear-gradient(180deg, #121733 0%, #1a2357 100%); }
+  /* header */
+  #head { position: absolute; top: 74px; left: 60px; display: flex; align-items: center; gap: 26px; z-index: 5; }
+  .tag { background: #e3262b; color: #fff; font-weight: 900; font-size: 32px; padding: 8px 22px; border-radius: 12px; letter-spacing: .5px; }
+  .hash { font-weight: 700; font-size: 30px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+  .el { position: absolute; opacity: 0; will-change: transform, opacity; }
+  .L { left: 60px; right: 60px; }
+  .sh { text-shadow: 0 6px 24px rgba(0,0,0,.55); }
+  .y { color: #ffcf2e; }
+  .lab { display: inline-block; font-weight: 900; font-size: 34px; padding: 8px 22px; border-radius: 10px; }
+  .lab.blue { background: #2f6bff; } .lab.red { background: #e3262b; }
+  .h-xxl { font-weight: 900; font-size: 136px; line-height: .98; letter-spacing: -3px; }
+  .h-xl { font-weight: 900; font-size: 96px; line-height: 1; letter-spacing: -2px; }
+  .h-l { font-weight: 900; font-size: 68px; line-height: 1.06; letter-spacing: -1px; }
+  .h-m { font-weight: 800; font-size: 46px; line-height: 1.2; }
+  .h-s { font-weight: 600; font-size: 38px; line-height: 1.35; }
+  .card { position: absolute; left: 60px; right: 60px; border-radius: 36px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+  .card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(60,20,110,.85) 100%); }
+  .score { position: absolute; left: 50%; width: 760px; margin-left: -380px; height: 170px; border-radius: 22px; z-index: 2;
+    background: linear-gradient(90deg, #ef2b4a 0%, #a33be0 55%, #3b5bff 100%); display: flex; align-items: center; justify-content: space-between; padding: 0 44px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.45); }
+  .score .ico { font-size: 92px; }
+  .score b { font-weight: 900; font-size: 64px; letter-spacing: -1px; text-align: center; line-height: 1.02; }
+  .score .chip { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); background: #ff4d6d; font-weight: 900; font-size: 26px; padding: 8px 22px; border-radius: 10px; white-space: nowrap; }
+  .row { display: flex; align-items: center; gap: 30px; }
+  .badge { background: #ffcf2e; color: #1a1a1a; font-weight: 900; font-size: 44px; padding: 6px 18px; border-radius: 12px; min-width: 170px; text-align: center; }
+  .row span { font-weight: 900; font-size: 66px; letter-spacing: -1px; }
+  .table { position: absolute; left: 60px; right: 60px; background: #fff; color: #111; border-radius: 30px; padding: 40px 40px 30px; box-shadow: 0 30px 80px rgba(0,0,0,.4); }
+  .table h3 { text-align: center; font-weight: 900; font-size: 44px; margin-bottom: 18px; }
+  .tr { display: flex; align-items: center; gap: 22px; padding: 20px 24px; border-radius: 16px; background: #f2f3f7; margin-bottom: 14px;
+    font-weight: 800; font-size: 44px; border: 4px solid transparent; }
+  .tr .no { font-size: 30px; color: #777; font-weight: 700; width: 70px; }
+  .tr .mfy { margin-left: auto; font-size: 30px; color: #888; font-weight: 800; }
+  .tr.on { border-color: #ffcf2e; background: #fff8dc; }
+  .band { position: absolute; left: 0; right: 0; overflow: hidden; }
+  .band img { width: 100%; height: 100%; object-fit: cover; }
+  .cta { display: inline-block; background: #e3262b; color: #fff; font-weight: 900; font-size: 52px; padding: 14px 30px; border-radius: 14px; }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 9; }
 </style>
 </head>
 <body>
 <div id="stage">
-  <!-- suratlar: data-in/out (s), Ken Burns: z0→z1 masshtab, x/y siljish (px) -->
-  <div class="ph" data-in="0" data-out="4.3" data-z="1.18,1.04" data-x="0,0" data-y="-40,30"><img src="photos/foto1.jpg" style="object-position:50% 30%"></div>
-  <div class="ph" data-in="4" data-out="8.3" data-z="1.05,1.2" data-x="-30,20" data-y="0,-20"><img src="photos/foto2.jpg" style="object-position:55% 40%"></div>
-  <div class="ph" data-in="8" data-out="12.8" data-z="1.02,1.16" data-x="0,0" data-y="30,-40"><img src="photos/foto3.jpg" style="object-position:50% 40%"></div>
-  <div class="ph" data-in="12.5" data-out="17.3" data-z="1.15,1.02" data-x="40,-20" data-y="0,0"><img src="photos/foto4.jpg" style="object-position:30% 40%"></div>
-  <div class="ph" data-in="17" data-out="22.3" data-z="1.0,1.2" data-x="0,0" data-y="0,40"><img src="photos/foto5.jpg" style="object-position:48% 45%"></div>
-  <div class="ph" data-in="22" data-out="99" data-z="1.1,1.0" data-x="0,0" data-y="0,0" data-blur="1"><img src="photos/foto1.jpg" style="object-position:50% 35%"></div>
-  <div id="shade"></div><div id="vignette"></div><div id="redflash"></div>
-  <div class="hazard" id="hz-top"></div><div class="hazard" id="hz-bot"></div>
+  <!-- 1: muqova -->
+  <div class="scene fade-b" data-in="0" data-out="4.6"><img class="full kb" data-z="1.15,1.03" data-y="-30,20" src="photos/foto1.jpg" style="object-position:50% 25%"></div>
+  <!-- 2: sabab (karta) -->
+  <div class="scene" data-in="4.4" data-out="9.6"><div class="bg-navy"></div>
+    <div class="card" style="top:520px;height:1080px"><img class="kb" data-z="1.0,1.12" data-y="0,0" src="photos/foto2.jpg" style="object-position:55% 35%"></div></div>
+  <!-- 3: vaqt -->
+  <div class="scene fade-b" data-in="9.4" data-out="14.6"><img class="full kb" data-z="1.02,1.15" data-y="20,-30" src="photos/foto3.jpg" style="object-position:50% 35%"></div>
+  <!-- 4: hududlar (jadval) -->
+  <div class="scene" data-in="14.4" data-out="20.1"><div class="bg-purple"></div></div>
+  <!-- 5: yakun -->
+  <div class="scene" data-in="19.9" data-out="99"><div class="bg-dark"></div>
+    <div class="band" style="top:470px;height:700px"><img class="kb" data-z="1.0,1.12" data-y="0,0" src="photos/foto5.jpg" style="object-position:50% 40%"></div>
+    <div class="band" style="top:1170px;height:750px;opacity:.35;filter:blur(18px)"><img src="photos/foto4.jpg"></div>
+    <div style="position:absolute;left:0;right:0;top:1170px;bottom:0;background:linear-gradient(180deg,rgba(18,23,51,.55),rgba(18,23,51,.95))"></div></div>
 
-  <!-- 1: DIQQAT -->
-  <div class="el" data-in="0.2" data-out="4.2" data-fx="pop" style="top:170px"><div class="alert" id="alert">❗</div></div>
-  <div class="el shadow" data-in="0.5" data-out="4.2" data-fx="pop" style="top:440px"><div class="t-huge yellow">DIQQAT!</div></div>
-  <div class="el" data-in="1.1" data-out="4.2" data-fx="up" style="top:1480px"><span class="pill">⚡ TAʼMIRLASH ISHLARI</span></div>
-  <div class="el shadow" data-in="1.4" data-out="4.2" data-fx="up" style="top:1600px"><div class="t-l">KETMOQDA</div></div>
+  <div id="head"><span class="tag">GUZOR YANGILIKLARI</span><span class="hash">#elektr_xabarlari</span></div>
 
-  <!-- 2: joy va sana -->
-  <div class="el shadow" data-in="4.2" data-out="8.2" data-fx="up" style="top:180px"><div class="t-m">📌 Gʻuzor tumani</div></div>
-  <div class="el" data-in="4.6" data-out="8.2" data-fx="pop" style="top:1300px"><div class="card"><div class="label">📆 SANA</div><div class="t-xl" style="margin-top:10px">11.11.2026</div><div class="t-s" style="color:#cbd5e1;margin-top:6px">yil</div></div></div>
+  <!-- 1 -->
+  <div class="el L" data-in="0.3" data-out="4.5" data-fx="up" style="top:1080px"><span class="lab blue">GʻUZOR TUMANI • 11.11.2026</span></div>
+  <div class="el L sh" data-in="0.5" data-out="4.5" data-fx="up" style="top:1160px"><div class="h-xxl y">DIQQAT!</div></div>
+  <div class="el L sh" data-in="0.75" data-out="4.5" data-fx="up" style="top:1300px"><div class="h-xl">TAʼMIRLASH<br>ISHLARI!</div></div>
+  <div class="el L sh" data-in="1.2" data-out="4.5" data-fx="up" style="top:1520px"><div class="h-s">Elektr taʼminotida uzilishlar kuzatiladi</div></div>
 
-  <!-- 3: sabab -->
-  <div class="el shadow" data-in="8.2" data-out="12.7" data-fx="up" style="top:170px"><div class="label">SABAB</div></div>
-  <div class="el shadow" data-in="8.4" data-out="12.7" data-fx="up" style="top:230px"><div class="t-xl">Pachkamar<br><span class="yellow">35/10 kV</span></div><div class="t-m" style="margin-top:10px">nimstansiyasi</div></div>
-  <div class="el" data-in="9.2" data-out="12.7" data-fx="up" style="top:1380px"><div class="card"><div class="t-m"><span class="yellow">T-1</span> transformatori<br>taʼmirga chiqishi<br>munosabati bilan</div></div></div>
+  <!-- 2 -->
+  <div class="el L sh" data-in="4.7" data-out="9.5" data-fx="left" style="top:250px"><div class="h-l">TAʼMIRLASH SABABI</div></div>
+  <div class="el L sh" data-in="5.1" data-out="9.5" data-fx="left" style="top:340px"><div class="h-m y">Pachkamar 35/10 kV nimstansiyasi</div></div>
+  <div class="el" data-in="5.7" data-out="9.5" data-fx="pop" style="left:0;right:0;top:1290px"><div class="score"><span class="chip">TAʼMIRGA CHIQDI</span><span class="ico">⚡</span><b>T-1<br><span style="font-size:36px;font-weight:800">TRANSFORMATORI</span></b><span class="ico">🔧</span></div></div>
+  <div class="el" data-in="6.3" data-out="9.5" data-fx="up" style="left:0;right:0;top:1480px;text-align:center"><div class="h-s" style="font-size:34px;font-weight:700">35/10 kV • Gʻuzor tumani</div></div>
 
-  <!-- 4: vaqt -->
-  <div class="el shadow" data-in="12.7" data-out="17.2" data-fx="up" style="top:180px"><div class="label">🕛 VAQT</div><div class="t-m" style="margin-top:12px">Taʼmirlash ishlari<br>olib boriladi</div></div>
-  <div class="el" data-in="13.1" data-out="17.2" data-fx="pop" style="top:1300px"><div class="card" style="padding:34px 40px"><div class="time"><b>12:00</b><span>→</span><b>18:00</b></div><div class="bar"><div id="bar"></div></div></div></div>
+  <!-- 3 -->
+  <div class="el L" data-in="9.7" data-out="14.5" data-fx="up" style="top:1100px"><span class="lab red">UZILISH VAQTI</span></div>
+  <div class="el L sh" data-in="10.1" data-out="14.5" data-fx="left" style="top:1200px"><div class="row"><span class="badge">SANA</span><span>11.11.2026</span></div></div>
+  <div class="el L sh" data-in="10.7" data-out="14.5" data-fx="left" style="top:1320px"><div class="row"><span class="badge">SOAT</span><span>12:00 dan</span></div></div>
+  <div class="el L sh" data-in="11.3" data-out="14.5" data-fx="left" style="top:1440px"><div class="row"><span class="badge">SOAT</span><span>18:00 gacha</span></div></div>
 
-  <!-- 5: hududlar -->
-  <div class="el shadow" data-in="17.2" data-out="22.2" data-fx="up" style="top:160px"><div class="t-m">Elektr taʼminotida<br><span class="yellow">uzilishlar kuzatiladi:</span></div></div>
-  <div class="el" data-in="17.8" data-out="22.2" data-fx="left" style="top:1040px"><div class="chips"><div class="chip"><i>⚡</i>Xumdon<small>MFY</small></div></div></div>
-  <div class="el" data-in="18.3" data-out="22.2" data-fx="left" style="top:1180px"><div class="chips"><div class="chip"><i>⚡</i>Boʻston<small>MFY</small></div></div></div>
-  <div class="el" data-in="18.8" data-out="22.2" data-fx="left" style="top:1320px"><div class="chips"><div class="chip"><i>⚡</i>Avgʻonbogʻ<small>MFY</small></div></div></div>
-  <div class="el" data-in="19.3" data-out="22.2" data-fx="left" style="top:1460px"><div class="chips"><div class="chip"><i>⚡</i>Obihayot<small>MFY</small></div></div></div>
+  <!-- 4 -->
+  <div class="el L sh" data-in="14.6" data-out="20" data-fx="left" style="top:250px"><div class="h-xl y">UZILISHLAR</div></div>
+  <div class="el L sh" data-in="15.0" data-out="20" data-fx="left" style="top:360px"><div class="h-m">KUZATILADIGAN HUDUDLAR</div></div>
+  <div class="el" data-in="15.4" data-out="20" data-fx="up" style="left:0;right:0;top:520px"><div class="table" style="position:relative;left:auto;right:auto;margin:0 60px">
+    <h3>GʻUZOR TUMANI</h3>
+    <div class="tr" id="r1"><span class="no">01</span>⚡ Xumdon<span class="mfy">MFY</span></div>
+    <div class="tr" id="r2"><span class="no">02</span>⚡ Boʻston<span class="mfy">MFY</span></div>
+    <div class="tr" id="r3"><span class="no">03</span>⚡ Avgʻonbogʻ<span class="mfy">MFY</span></div>
+    <div class="tr" id="r4" style="margin-bottom:0"><span class="no">04</span>⚡ Obihayot<span class="mfy">MFY</span></div></div></div>
+  <div class="el L sh" data-in="17.6" data-out="20" data-fx="up" style="top:1260px"><div class="h-m">⏰ Uzilish vaqti:</div><div class="h-xl y">12:00 — 18:00</div><div class="h-s" style="margin-top:10px">11.11.2026</div></div>
 
-  <!-- 6: xulosa -->
-  <div class="el shadow" data-in="22.2" data-out="99" data-fx="pop" style="top:200px"><div class="t-xl yellow">❗ DIQQAT!</div><div class="t-m" style="margin-top:14px">Taʼmirlash ishlari</div></div>
-  <div class="el" data-in="22.7" data-out="99" data-fx="up" style="top:620px"><div class="card" style="width:900px;margin:0 auto">
-    <div class="row"><span>📌 Hudud</span><span>Gʻuzor tumani</span></div>
-    <div class="row"><span>📆 Sana</span><span>11.11.2026</span></div>
-    <div class="row"><span>🕛 Vaqt</span><span>12:00 – 18:00</span></div>
-    <div class="row"><span>🏭 Obyekt</span><span>Pachkamar 35/10 kV, T-1</span></div>
-    <div style="height:3px;background:rgba(255,204,0,.4);margin:16px 0"></div>
-    <div class="label" style="text-align:left;margin-bottom:8px">UZILISHLAR KUZATILADI:</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 30px;font-size:42px;font-weight:800;text-align:left"><div>⚡ Xumdon</div><div>⚡ Boʻston</div><div>⚡ Avgʻonbogʻ</div><div>⚡ Obihayot</div></div></div></div>
-  <div class="el shadow" data-in="23.4" data-out="99" data-fx="up" style="top:1560px"><div class="t-s">Iltimos, oldindan tayyorgarlik koʻring.<br><span class="yellow">Tushunganingiz uchun rahmat!</span></div></div>
+  <!-- 5 -->
+  <div class="el L sh" data-in="20.1" data-out="99" data-fx="left" style="top:250px"><div class="h-xl y">EʼTIBOR BERING!</div></div>
+  <div class="el L sh" data-in="20.8" data-out="99" data-fx="up" style="top:1240px"><div class="h-s" style="font-weight:700">Pachkamar 35/10 kV nimstansiyasining T-1 transformatori taʼmirga chiqishi munosabati bilan 11.11.2026 kuni soat <span class="y">12:00 dan 18:00 gacha</span> taʼmirlash ishlari olib boriladi.</div></div>
+  <div class="el L" data-in="21.8" data-out="99" data-fx="pop" style="top:1570px;transform-origin:left center"><span class="cta">OLDINDAN TAYYORLANING!</span></div>
 
   <div id="flash"></div>
 </div>
@@ -106,43 +115,37 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const prog = (t, a, d) => clamp((t - a) / d);
 const easeOut = x => 1 - Math.pow(1 - x, 3);
 const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-const easeBack = x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
-const nums = s => s.split(',').map(Number);
-const phs = [...document.querySelectorAll('.ph')].map(e => ({ e, img: e.querySelector('img'), a: +e.dataset.in, b: +e.dataset.out,
-  z: nums(e.dataset.z), x: nums(e.dataset.x), y: nums(e.dataset.y), blur: !!e.dataset.blur }));
+const easeBack = x => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const nums = s => (s || '0,0').split(',').map(Number);
+const scenes = [...document.querySelectorAll('.scene')].map(e => ({ e, a: +e.dataset.in, b: +e.dataset.out,
+  kb: [...e.querySelectorAll('.kb')].map(i => ({ i, z: nums(i.dataset.z), y: nums(i.dataset.y) })) }));
 const els = [...document.querySelectorAll('.el')].map(e => ({ e, a: +e.dataset.in, b: +e.dataset.out, fx: e.dataset.fx }));
-const flash = document.getElementById('flash'), red = document.getElementById('redflash'), alertEl = document.getElementById('alert'), bar = document.getElementById('bar');
-const hzT = document.getElementById('hz-top'), hzB = document.getElementById('hz-bot');
-const CUTS = [4.15, 8.15, 12.65, 17.15, 22.15];
+const rows = [1, 2, 3, 4].map(i => document.getElementById('r' + i));
+const flash = document.getElementById('flash');
+const CUTS = [4.5, 9.5, 14.5, 20];
 
 function renderAt(t) {
-  for (const p of phs) {
-    if (t < p.a || t > p.b) { p.e.style.opacity = 0; continue; }
-    const u = easeInOut(clamp((t - p.a) / Math.min(p.b - p.a, 6)));
-    const z = p.z[0] + (p.z[1] - p.z[0]) * u, x = p.x[0] + (p.x[1] - p.x[0]) * u, y = p.y[0] + (p.y[1] - p.y[0]) * u;
-    p.img.style.transform = `translate(${x}px,${y}px) scale(${z})`;
-    p.img.style.filter = p.blur ? 'blur(14px) brightness(.55)' : 'none';
-    p.e.style.opacity = clamp((t - p.a) / .3) * clamp((p.b - t) / .3);
+  for (const s of scenes) {
+    if (t < s.a || t > s.b) { s.e.style.opacity = 0; continue; }
+    s.e.style.opacity = clamp((t - s.a) / .2) * clamp((s.b - t) / .2);
+    const u = easeInOut(clamp((t - s.a) / Math.min(s.b - s.a, 6)));
+    for (const k of s.kb) k.i.style.transform = `translateY(${k.y[0] + (k.y[1] - k.y[0]) * u}px) scale(${k.z[0] + (k.z[1] - k.z[0]) * u})`;
   }
   for (const { e, a, b, fx } of els) {
     if (t < a || t >= b) { e.style.opacity = 0; continue; }
-    const pin = prog(t, a, .5), pout = prog(t, b - .3, .3);
+    const pin = prog(t, a, .45), pout = prog(t, b - .25, .25);
     let tr = '';
-    if (fx === 'up') tr = `translateY(${(1 - easeOut(pin)) * 80}px)`;
+    if (fx === 'up') tr = `translateY(${(1 - easeOut(pin)) * 60}px)`;
+    if (fx === 'left') tr = `translateX(${(1 - easeOut(pin)) * -120}px)`;
     if (fx === 'pop') tr = `scale(${Math.max(0, easeBack(pin))})`;
-    if (fx === 'left') tr = `translateX(${(1 - easeOut(pin)) * -300}px)`;
-    e.style.transform = tr; e.style.opacity = clamp(pin * 1.6) * (1 - pout);
+    e.style.transform = tr; e.style.opacity = clamp(pin * 1.8) * (1 - pout);
   }
-  const pulse = (Math.sin(t * Math.PI * 2 * 1.2) + 1) / 2;
-  alertEl.style.boxShadow = `0 0 0 ${pulse * 40}px rgba(224,36,36,${.55 * (1 - pulse)})`;
-  red.style.opacity = t < 4 ? (Math.sin(t * Math.PI * 2 * 1.2) > .6 ? .18 : 0) * (1 - prog(t, 3, 1)) : 0;
-  bar.style.width = (easeInOut(prog(t, 13.4, 3)) * 100) + '%';
-  const sh = (t * 60) % 68; hzT.style.backgroundPosition = `${sh}px 0`; hzB.style.backgroundPosition = `${-sh}px 0`;
-  let f = 0; for (const c of CUTS) f = Math.max(f, 1 - Math.abs(t - c) / .15); flash.style.opacity = clamp(f) * .7;
+  rows.forEach((r, i) => r.classList.toggle('on', t >= 16.0 + i * .45));
+  let f = 0; for (const c of CUTS) f = Math.max(f, 1 - Math.abs(t - c) / .12); flash.style.opacity = clamp(f) * .55;
 }
 window.renderAt = renderAt;
 window.ready = Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode())]).then(() => { renderAt(0); return true; });
-if (!navigator.webdriver) window.ready.then(() => { const t0 = performance.now(); const loop = () => { renderAt(((performance.now() - t0) / 1000) % 27); requestAnimationFrame(loop); }; loop(); });
+if (!navigator.webdriver) window.ready.then(() => { const t0 = performance.now(); const loop = () => { renderAt(((performance.now() - t0) / 1000) % 25); requestAnimationFrame(loop); }; loop(); });
 </script>
 </body>
 </html>
