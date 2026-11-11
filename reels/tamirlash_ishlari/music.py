@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """E'lon uchun jiddiy, ritmik fon musiqasi (sintez) + boshida ogohlantirish signali.
-Ishlatish: python3 music.py chiqish.wav [davomiylik_s]"""
+Ishlatish: python3 music.py chiqish.wav [davomiylik_s] [otish_vaqtlari] [ding_vaqtlari]"""
 import sys, wave
 import numpy as np
 
@@ -40,10 +40,12 @@ for b in range(int(dur / bar) + 1):
         if k in (1, 3): add(.1 * rng.standard_normal(int(.12 * SR)) * np.exp(-np.arange(int(.12 * SR)) / SR * 30), t0 + k * beat)
 
 for i in range(4): add(tone(1250, .16, .16, 'beep'), .15 + i * .42)          # ogohlantirish signali
-for c in (4.5, 9.5, 14.5, 20.0):                                 # o'tish "whoosh"
+CUTS = [float(x) for x in sys.argv[3].split(',')] if len(sys.argv) > 3 else [4.5, 9.5, 14.5, 20.0]
+DINGS = [float(x) for x in sys.argv[4].split(',')] if len(sys.argv) > 4 else [16.0, 16.45, 16.9, 17.35]
+for c in CUTS:                                 # o'tish "whoosh"
     m = int(.6 * SR); tt = np.arange(m) / SR
     add(.22 * np.convolve(rng.standard_normal(m), np.ones(12) / 12, 'same') * np.sin(np.pi * tt / .6) ** 2, c - .4)
-for c in (16.0, 16.45, 16.9, 17.35): add(tone(hz(86), .4, .06, 'pluck'), c)    # MFY chiqqanda "ding"
+for c in DINGS: add(tone(hz(86), .4, .06, 'pluck'), c)    # MFY chiqqanda "ding"
 
 mix *= np.minimum(1, t / .3) * np.minimum(1, (dur - t) / 1.5)
 pcm = (np.tanh(mix * 1.1) * .85 * 32767).astype(np.int16)
