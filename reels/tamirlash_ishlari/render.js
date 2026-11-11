@@ -1,5 +1,6 @@
 // "Taʼmirlash ishlari" reel: index.html -> kadrlar -> MP4 (1080x1920, 30fps), musiqa + diktor ovozi bilan.
 //   node render.js                    -> tamirlash_ishlari_reel.mp4
+//   SCALE=2 node render.js            -> tamirlash_ishlari_reel_4k.mp4 (2160x3840)
 //   node render.js --preview 2,6,10   -> preview_<t>.png (index.html vaqt shkalasida)
 // Diktor: voice/vo1..5.mp3 (har sahnaga bittadan). Sahnalar ovoz uzunligiga moslab cho'ziladi;
 // diktor gapirganda musiqa pasayadi. Fayllar bo'lmasa — faqat musiqa.
@@ -9,7 +10,8 @@ const { spawn, execFileSync } = require('child_process');
 const { chromium } = require('playwright');
 
 const DIR = __dirname, FPS = 30;
-const OUT = path.join(DIR, 'tamirlash_ishlari_reel.mp4');
+const SCALE = +(process.env.SCALE || 1);            // SCALE=2 -> 2160x3840 (4K)
+const OUT = path.join(DIR, SCALE === 2 ? 'tamirlash_ishlari_reel_4k.mp4' : 'tamirlash_ishlari_reel.mp4');
 const ORIG = [0, 4.5, 9.5, 14.5, 20, 25];            // index.html dagi sahna chegaralari
 const LEAD = 0.45, TAIL = [0.5, 0.5, 0.5, 0.6, 1.6];
 const VO = ORIG.slice(0, -1).map((_, i) => path.join(DIR, 'voice', `vo${i + 1}.mp3`));
@@ -34,7 +36,7 @@ const server = http.createServer((req, res) => {
 (async () => {
   await new Promise(r => server.listen(0, r));
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: SCALE });
   page.on('pageerror', e => console.error('PAGE ERROR', e));
   await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
   await page.evaluate(() => window.ready);
@@ -57,14 +59,14 @@ const server = http.createServer((req, res) => {
       f.push('[duck][vo]amix=inputs=2:normalize=0,alimiter=limit=0.95[a]');
       args.push('-filter_complex', f.join(';'), '-map', '0:v', '-map', '[a]');
     } else console.error("OGOHLANTIRISH: voice/vo1..5.mp3 topilmadi — faqat musiqa qo'yiladi.");
-    args.push('-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
+    args.push('-c:v', 'libx264', '-preset', 'medium', '-crf', '16', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
       '-c:a', 'aac', '-b:a', '192k', '-t', String(DURATION), '-movflags', '+faststart', OUT);
     const ff = spawn('ffmpeg', args, { stdio: ['pipe', 'inherit', 'inherit'] });
     const N = Math.round(FPS * DURATION);
     console.log('Sahnalar (s):', LEN.map(l => l.toFixed(2)).join(', '), '| jami', DURATION.toFixed(2));
     for (let i = 0; i < N; i++) {
       await page.evaluate(t => window.renderAt(t), warp(i / FPS));
-      const buf = await page.screenshot({ type: 'jpeg', quality: 92 });
+      const buf = await page.screenshot({ type: 'jpeg', quality: 97 });
       if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
     }
     ff.stdin.end(); await new Promise(r => ff.on('close', r));
