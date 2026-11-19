@@ -118,6 +118,9 @@ OV = np.zeros((H, W, 4), np.float32)
 OV_WHITE = np.broadcast_to(top_a, (H, W)).astype(np.float32)
 OV_NAVY = np.broadcast_to(bot_a, (H, W)).astype(np.float32)
 NAVY_ARR = np.array(NAVY, np.float32)
+# ikkala qatlam bitta ko'paytma + qo'shiluvchi ko'rinishida (tezroq)
+OV_MUL = ((1 - OV_NAVY) * (1 - OV_WHITE))[..., None]
+OV_ADD = (OV_NAVY[..., None] * NAVY_ARR) * (1 - OV_WHITE[..., None]) + 255 * OV_WHITE[..., None]
 
 
 def header_layer():
@@ -187,8 +190,7 @@ def scene_rgb(i, lt):
     name, fx0, fx1, z0, z1 = SCENES[i][:5]
     p = smooth(lt / LENS[i])
     base = photo_frame(name, fx0 + (fx1 - fx0) * p, z0 + (z1 - z0) * p)
-    base = base * (1 - OV_NAVY[..., None]) + NAVY_ARR * OV_NAVY[..., None]
-    base = base * (1 - OV_WHITE[..., None]) + 255 * OV_WHITE[..., None]
+    base = base * OV_MUL + OV_ADD
     f = Image.fromarray(base.clip(0, 255).astype(np.uint8)).convert("RGBA")
     f.alpha_composite(HEADER, (0, 0))
     # matn: pastdan siljib chiqadi, sahna oxirida so'nadi
@@ -221,19 +223,39 @@ def render(t):
     return cur
 
 
-def main():
-    tmp = OUT + ".noaudio.mp4"
-    n = int(DURATION * FPS)
+def render_part(args):
+    """Kadrlar [a, b) oralig'ini alohida faylga yozadi (parallel ishlash uchun)."""
+    a, b, path = args
     proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
                              "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium",
-                             "-crf", "18", "-pix_fmt", "yuv420p",
-                             *(["-profile:v", "high", "-level", "5.2"] if K > 1 else []), tmp], stdin=subprocess.PIPE)
-    for k in range(n):
+                             "-crf", "18", "-pix_fmt", "yuv420p", "-threads", "1",
+                             *(["-profile:v", "high", "-level", "5.2"] if K > 1 else []), path], stdin=subprocess.PIPE)
+    for k in range(a, b):
         proc.stdin.write(render(k / FPS).clip(0, 255).astype(np.uint8).tobytes())
-        if k % 90 == 0:
-            print(f"  kadr {k}/{n}")
+        if (k - a) % 60 == 0:
+            print(f"  kadr {k} ({a}-{b})", flush=True)
     proc.stdin.close()
     proc.wait()
+    return path
+
+
+def main():
+    import multiprocessing as mp
+    tmp = OUT + ".noaudio.mp4"
+    n = int(DURATION * FPS)
+    jobs = os.cpu_count() or 1
+    step = -(-n // jobs)
+    parts = [(i, min(n, i + step), f"{OUT}.part{j}.mp4") for j, i in enumerate(range(0, n, step))]
+    with mp.get_context("fork").Pool(len(parts)) as pool:
+        pool.map(render_part, parts)
+    lst = OUT + ".parts.txt"
+    with open(lst, "w") as fh:
+        fh.writelines(f"file '{os.path.abspath(p)}'\n" for _, _, p in parts)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst,
+                    "-c", "copy", tmp], check=True)
+    for _, _, p in parts:
+        os.remove(p)
+    os.remove(lst)
     # faqat diktor ovozi (fon musiqasiz), oxiriga qisqa jimlik
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp, "-i", VOICE, "-map", "0:v", "-map", "1:a",
                     "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
