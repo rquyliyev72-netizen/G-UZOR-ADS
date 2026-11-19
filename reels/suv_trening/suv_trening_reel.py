@@ -7,8 +7,9 @@ chap tepada logotip, sariq teg, sariq vertikal chiziq + oq qalin sarlavha,
 sahnalar orasida yumshoq o'tish, oxirida ko'k logotip kartasi (namunadan).
 
 Ishga tushirish:
-  python3 suv_trening_reel.py NAMUNA.mp4 [chiqish.mp4]
-NAMUNA.mp4 — logotip, yakuniy karta va musiqa olinadigan namuna video.
+  python3 suv_trening_reel.py NAMUNA.mp4 OVOZ.mp3 [chiqish.mp4]
+NAMUNA.mp4 — logotip va yakuniy karta olinadigan namuna video.
+OVOZ.mp3   — diktor ovozi (fon musiqasiz); sahnalar ovozdagi gaplarga moslanadi.
 Talab: Pillow, numpy, ffmpeg.
 """
 import os
@@ -20,17 +21,21 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SAMPLE = sys.argv[1]
-OUT = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, "suv_trening_reel.mp4")
+VOICE = sys.argv[2]
+OUT = sys.argv[3] if len(sys.argv) > 3 and not sys.argv[3].startswith("--") else os.path.join(HERE, "suv_trening_reel.mp4")
 W, H, FPS = 1080, 1920, 30
 FONT_DIR = "/usr/share/fonts/opentype/inter"
 YELLOW = (255, 196, 0)
 NAVY = (18, 28, 62)
 WHITE = (255, 255, 255)
 
-SCENE = 5.4       # har bir sahna davomiyligi
-XF = 0.7          # sahnalar orasidagi o'tish
+XF = 0.6          # sahnalar orasidagi o'tish
+LEAD = 0.35       # sahna gapdan shuncha oldin almashadi
 OUTRO_FROM = 34.0  # namunadagi yakuniy karta boshlanishi
-OUTRO_LEN = 3.7
+# Ovozdagi gaplarning boshlanish vaqtlari (pauzalar bo'yicha aniqlangan), s:
+# 1 kirish, 2 SCADA, 3 texnologiyalar, 4 loyiha/PQ-141, 5 sertifikat, 6 hamkorlar, 7 "Suvni tejaylik"
+VOICE_BOUNDS = [0.0, 4.98, 9.45, 15.67, 24.58, 29.76, 36.10]
+VOICE_LEN = 39.47
 
 # (rasm, fokus_x boshlanish, fokus_x tugash, zoom bosh, zoom oxir, teg, sarlavha, izoh)
 SCENES = [
@@ -48,9 +53,11 @@ SCENES = [
      "Islom taraqqiyot banki\nva BMT Taraqqiyot dasturi", "Iqtisodiyot va moliya vazirligi huzuridagi\nBirlashtirilgan loyihalarni amalga oshirish guruhi"),
 ]
 N = len(SCENES)
-MAIN_LEN = N * SCENE - (N - 1) * XF
-OUTRO_START = MAIN_LEN - XF
-DURATION = OUTRO_START + OUTRO_LEN
+STARTS = [0.0] + [b - LEAD for b in VOICE_BOUNDS[1:]]   # N sahna + yakuniy karta
+OUTRO_START = STARTS[N]
+DURATION = VOICE_LEN + 0.6
+OUTRO_LEN = DURATION - OUTRO_START
+LENS = [STARTS[i + 1] + XF - STARTS[i] for i in range(N)]
 
 
 def font(w, s):
@@ -177,14 +184,14 @@ TEXT_Y = H - 760 - 170
 
 def scene_rgb(i, lt):
     name, fx0, fx1, z0, z1 = SCENES[i][:5]
-    p = smooth(lt / SCENE)
+    p = smooth(lt / LENS[i])
     base = photo_frame(name, fx0 + (fx1 - fx0) * p, z0 + (z1 - z0) * p)
     base = base * (1 - OV_NAVY[..., None]) + NAVY_ARR * OV_NAVY[..., None]
     base = base * (1 - OV_WHITE[..., None]) + 255 * OV_WHITE[..., None]
     f = Image.fromarray(base.clip(0, 255).astype(np.uint8)).convert("RGBA")
     f.alpha_composite(HEADER, (0, 0))
     # matn: pastdan siljib chiqadi, sahna oxirida so'nadi
-    a = ease((lt - 0.45) / 0.6) * (1 - smooth((lt - (SCENE - XF - 0.15)) / 0.45))
+    a = ease((lt - 0.45) / 0.6) * (1 - smooth((lt - (LENS[i] - XF - 0.15)) / 0.45))
     if a > 0.01:
         timg, _ = TEXTS[i]
         t2 = timg.copy()
@@ -199,14 +206,13 @@ def render(t):
         a = smooth((t - OUTRO_START) / XF)
         if a >= 1:
             return o
-        last = scene_rgb(N - 1, t - (N - 1) * (SCENE - XF))
+        last = scene_rgb(N - 1, t - STARTS[N - 1])
         return last * (1 - a) + o * a
-    step = SCENE - XF
-    i = min(N - 1, int(t // step))
-    lt = t - i * step
+    i = max(k for k in range(N) if STARTS[k] <= t)
+    lt = t - STARTS[i]
     cur = scene_rgb(i, lt)
     if i > 0 and lt < XF:
-        prev = scene_rgb(i - 1, lt + step)
+        prev = scene_rgb(i - 1, t - STARTS[i - 1])
         a = smooth(lt / XF)
         cur = prev * (1 - a) + cur * a
     if t < 0.35:
@@ -226,10 +232,10 @@ def main():
             print(f"  kadr {k}/{n}")
     proc.stdin.close()
     proc.wait()
-    # namunadagi musiqa: boshidan, oxiri yumshoq so'nadi
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp, "-i", SAMPLE, "-map", "0:v", "-map", "1:a",
-                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
-                    "-af", f"afade=t=out:st={DURATION - 1.5:.2f}:d=1.5", "-t", f"{DURATION:.2f}",
+    # faqat diktor ovozi (fon musiqasiz), oxiriga qisqa jimlik
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp, "-i", VOICE, "-map", "0:v", "-map", "1:a",
+                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+                    "-af", "apad", "-t", f"{DURATION:.2f}",
                     "-movflags", "+faststart", OUT], check=True)
     os.remove(tmp)
     print("Tayyor:", OUT, f"({DURATION:.1f} s)")
@@ -237,7 +243,7 @@ def main():
 
 if __name__ == "__main__":
     if "--preview" in sys.argv:
-        times = [1.5, 6.5, 11.0, 16.0, 21.0, 26.5, 29.0, DURATION - 0.5]
+        times = [b + 1.5 for b in VOICE_BOUNDS] + [DURATION - 0.3]
         ims = [Image.fromarray(render(t).clip(0, 255).astype(np.uint8)).resize((270, 480)) for t in times]
         sheet = Image.new("RGB", (270 * len(ims), 480))
         for j, im in enumerate(ims):
