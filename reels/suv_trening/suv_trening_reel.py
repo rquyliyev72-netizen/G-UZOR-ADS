@@ -7,7 +7,8 @@ chap tepada logotip, sariq teg, sariq vertikal chiziq + oq qalin sarlavha,
 sahnalar orasida yumshoq o'tish, oxirida ko'k logotip kartasi (namunadan).
 
 Ishga tushirish:
-  python3 suv_trening_reel.py NAMUNA.mp4 OVOZ.mp3 [chiqish.mp4]
+  python3 suv_trening_reel.py NAMUNA.mp4 OVOZ.mp3 [chiqish.mp4] [--4k]
+--4k bilan 2160x3840 (4K) chiqadi, aks holda 1080x1920.
 NAMUNA.mp4 — logotip va yakuniy karta olinadigan namuna video.
 OVOZ.mp3   — diktor ovozi (fon musiqasiz); sahnalar ovozdagi gaplarga moslanadi.
 Talab: Pillow, numpy, ffmpeg.
@@ -23,7 +24,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SAMPLE = sys.argv[1]
 VOICE = sys.argv[2]
 OUT = sys.argv[3] if len(sys.argv) > 3 and not sys.argv[3].startswith("--") else os.path.join(HERE, "suv_trening_reel.mp4")
-W, H, FPS = 1080, 1920, 30
+K = 2 if "--4k" in sys.argv else 1   # o'lcham koeffitsiyenti (4K uchun 2)
+W, H, FPS = 1080 * K, 1920 * K, 30
 FONT_DIR = "/usr/share/fonts/opentype/inter"
 YELLOW = (255, 196, 0)
 NAVY = (18, 28, 62)
@@ -89,10 +91,10 @@ def grab(t, scale=None):
 
 
 card = grab(35.0).crop((72, 328, 645, 900))
-LOGO = card.resize((92, 92), Image.LANCZOS).convert("RGBA")
+LOGO = card.resize((92 * K, 92 * K), Image.LANCZOS).convert("RGBA")
 m = Image.new("L", (368, 368), 0)
 ImageDraw.Draw(m).rounded_rectangle([0, 0, 367, 367], 80, fill=255)
-LOGO.putalpha(m.resize((92, 92), Image.LANCZOS))
+LOGO.putalpha(m.resize((92 * K, 92 * K), Image.LANCZOS))
 
 
 def outro_frames():
@@ -119,11 +121,11 @@ NAVY_ARR = np.array(NAVY, np.float32)
 
 
 def header_layer():
-    img = Image.new("RGBA", (W, 220), (0, 0, 0, 0))
-    img.alpha_composite(LOGO, (66, 140))
+    img = Image.new("RGBA", (W, 220 * K), (0, 0, 0, 0))
+    img.alpha_composite(LOGO, (66 * K, 140 * K))
     d = ImageDraw.Draw(img)
-    d.text((176, 146), "G‘UZOR TUMANI HOKIMLIGI", font=font("xb", 34), fill=(30, 30, 40))
-    d.text((176, 190), "AXBOROT XIZMATI", font=font("xb", 26), fill=(222, 160, 0))
+    d.text((176 * K, 146 * K), "G‘UZOR TUMANI HOKIMLIGI", font=font("xb", 34 * K), fill=(30, 30, 40))
+    d.text((176 * K, 190 * K), "AXBOROT XIZMATI", font=font("xb", 26 * K), fill=(222, 160, 0))
     return img
 
 
@@ -138,7 +140,6 @@ for s in SCENES:
 
 def photo_frame(name, fx, z):
     im = PHOTOS[name]
-    ch = H / 1.12 * 1.0 / z * 1.12 / 1.12
     ch = im.height / 1.12 / z * 1.0
     cw = ch * W / H
     cx = fx * im.width
@@ -150,36 +151,36 @@ def photo_frame(name, fx, z):
 
 def text_block(tag, title, sub):
     """Teg, sariq chiziq, sarlavha va izoh — pastki chap burchakda."""
-    img = Image.new("RGBA", (W, 760), (0, 0, 0, 0))
+    img = Image.new("RGBA", (W, 760 * K), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     tl = title.split("\n")
-    size = 64
-    while max(font("xb", size).getlength(l) for l in tl) > W - 150:
+    size = 64 * K
+    while max(font("xb", size).getlength(l) for l in tl) > W - 150 * K:
         size -= 2
-    ft, fs, fg = font("xb", size), font("b", 36), font("b", 34)
+    ft, fs, fg = font("xb", size), font("b", 36 * K), font("b", 34 * K)
     sl = sub.split("\n") if sub else []
-    lh_t, lh_s = int(size * 1.22), 48
-    h_text = len(tl) * lh_t + (18 + len(sl) * lh_s if sl else 0)
-    y0 = 760 - 40 - h_text
+    lh_t, lh_s = int(size * 1.22), 48 * K
+    h_text = len(tl) * lh_t + (18 * K + len(sl) * lh_s if sl else 0)
+    y0 = (760 - 40) * K - h_text
     # teg
     tw = d.textlength(tag, font=fg)
-    d.rounded_rectangle([66, y0 - 92, 66 + tw + 36, y0 - 30], 12, fill=YELLOW)
-    d.text((84, y0 - 61), tag, font=fg, fill=(20, 20, 30), anchor="lm")
+    d.rounded_rectangle([66 * K, y0 - 92 * K, 66 * K + tw + 36 * K, y0 - 30 * K], 12 * K, fill=YELLOW)
+    d.text((84 * K, y0 - 61 * K), tag, font=fg, fill=(20, 20, 30), anchor="lm")
     # chiziq
-    d.rectangle([66, y0 + 6, 74, y0 + h_text - 6], fill=YELLOW)
+    d.rectangle([66 * K, y0 + 6 * K, 74 * K, y0 + h_text - 6 * K], fill=YELLOW)
     y = y0
     for line in tl:
-        d.text((100, y), line, font=ft, fill=WHITE)
+        d.text((100 * K, y), line, font=ft, fill=WHITE)
         y += lh_t
-    y += 18
+    y += 18 * K
     for line in sl:
-        d.text((100, y), line, font=fs, fill=YELLOW)
+        d.text((100 * K, y), line, font=fs, fill=YELLOW)
         y += lh_s
     return img, y0
 
 
 TEXTS = [text_block(s[5], s[6], s[7]) for s in SCENES]
-TEXT_Y = H - 760 - 170
+TEXT_Y = H - (760 + 170) * K
 
 
 def scene_rgb(i, lt):
@@ -196,7 +197,7 @@ def scene_rgb(i, lt):
         timg, _ = TEXTS[i]
         t2 = timg.copy()
         t2.putalpha(Image.fromarray((np.asarray(t2.getchannel("A"), np.float32) * a).astype(np.uint8)))
-        f.alpha_composite(t2, (int(-40 * (1 - a)), TEXT_Y + int(50 * (1 - a))))
+        f.alpha_composite(t2, (int(-40 * K * (1 - a)), TEXT_Y + int(50 * K * (1 - a))))
     return np.asarray(f.convert("RGB"), np.float32)
 
 
@@ -225,7 +226,8 @@ def main():
     n = int(DURATION * FPS)
     proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
                              "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium",
-                             "-crf", "18", "-pix_fmt", "yuv420p", tmp], stdin=subprocess.PIPE)
+                             "-crf", "18", "-pix_fmt", "yuv420p",
+                             *(["-profile:v", "high", "-level", "5.2"] if K > 1 else []), tmp], stdin=subprocess.PIPE)
     for k in range(n):
         proc.stdin.write(render(k / FPS).clip(0, 255).astype(np.uint8).tobytes())
         if k % 90 == 0:
