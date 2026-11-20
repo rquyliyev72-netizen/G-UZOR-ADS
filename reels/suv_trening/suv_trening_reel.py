@@ -9,11 +9,12 @@ sahnalar orasida yumshoq o'tish, oxirida ko'k logotip kartasi (namunadan).
 Ishga tushirish:
   python3 suv_trening_reel.py NAMUNA.mp4 OVOZ.mp3 [chiqish.mp4] [--4k]
 --4k bilan 2160x3840 (4K) chiqadi, aks holda 1080x1920.
-NAMUNA.mp4 — logotip va yakuniy karta olinadigan namuna video.
+NAMUNA.mp4 — logotip olinadigan namuna video (yakuniy 3D animatsiya shu logotipdan yasaladi).
 OVOZ.mp3   — diktor ovozi (fon musiqasiz); sahnalar ovozdagi gaplarga moslanadi.
 Talab: Pillow, numpy, ffmpeg.
 """
 import os
+import random
 import subprocess
 import sys
 
@@ -33,7 +34,6 @@ WHITE = (255, 255, 255)
 
 XF = 0.6          # sahnalar orasidagi o'tish
 LEAD = 0.35       # sahna gapdan shuncha oldin almashadi
-OUTRO_FROM = 34.0  # namunadagi yakuniy karta boshlanishi
 # Ovozdagi gaplarning boshlanish vaqtlari (pauzalar bo'yicha aniqlangan), s:
 # 1 kirish, 2 SCADA, 3 texnologiyalar, 4 loyiha/PQ-141, 5 sertifikat, 6 hamkorlar, 7 "Suvni tejaylik"
 VOICE_BOUNDS = [0.0, 4.98, 9.45, 15.67, 24.58, 29.76, 36.10]
@@ -97,16 +97,129 @@ ImageDraw.Draw(m).rounded_rectangle([0, 0, 367, 367], 80, fill=255)
 LOGO.putalpha(m.resize((92 * K, 92 * K), Image.LANCZOS))
 
 
-def outro_frames():
-    n = int(OUTRO_LEN * FPS) + 2
-    p = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", str(OUTRO_FROM), "-i", SAMPLE, "-frames:v", str(n),
-                        "-vf", f"fps={FPS},scale={W}:{H}:flags=lanczos", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
-                       capture_output=True, check=True).stdout
-    return np.frombuffer(p, np.uint8).reshape(-1, H, W, 3)
+# ---------- yakuniy 3D logotip ----------
+def ease_back(x, k=1.5):
+    x = clamp(x) - 1
+    return x * x * ((k + 1) * x + k) + 1
 
 
-print("Namunadan yakuniy karta olinmoqda...")
-OUTRO = outro_frames()
+def make_outro_bg():
+    """Ko'k radial fon + markazdan o'tuvchi gorizontal nur (namunadagidek)."""
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    cx, cy = W / 2, H * 0.47
+    d = np.sqrt(((xx - cx) / W) ** 2 + ((yy - cy) / (H * 0.62)) ** 2)
+    g = np.clip(1 - d / 0.85, 0, 1)[..., None]
+    dark, mid = np.array([4, 8, 48], np.float32), np.array([18, 48, 190], np.float32)
+    img = dark + (mid - dark) * g ** 1.4
+    band = np.exp(-((yy - cy) / (H * 0.055)) ** 2)[..., None]
+    img += band * np.array([20, 50, 140], np.float32) * 0.55
+    return img
+
+
+OUTRO_BG = make_outro_bg()
+CARD_W = int(W * 0.40)                       # avvalgidan kichikroq
+SS = 2                                       # chekkalar silliq chiqishi uchun
+CW2 = CARD_W * SS
+CARD_TEX = card.resize((CW2, CW2), Image.LANCZOS).convert("RGBA")
+_cm = Image.new("L", (CW2 * 2, CW2 * 2), 0)
+ImageDraw.Draw(_cm).rounded_rectangle([0, 0, CW2 * 2 - 1, CW2 * 2 - 1], int(CW2 * 0.28), fill=255)
+CARD_MASK = _cm.resize((CW2, CW2), Image.LANCZOS)
+CARD_TEX.putalpha(CARD_MASK)
+CANVAS = int(CARD_W * 1.9)
+_pad = int(CARD_W * 0.15)
+SHADOW = Image.new("RGBA", (int(CARD_W * 1.1) + 2 * _pad, int(CARD_W * 0.16) + 2 * _pad), (0, 0, 0, 0))
+ImageDraw.Draw(SHADOW).ellipse([_pad, _pad, SHADOW.width - 1 - _pad, SHADOW.height - 1 - _pad], fill=(0, 0, 20, 170))
+SHADOW = SHADOW.filter(ImageFilter.GaussianBlur(CARD_W * 0.04))
+_gs = int(CARD_W * 1.8)
+GLOW = Image.new("RGBA", (_gs, _gs), (0, 0, 0, 0))
+ImageDraw.Draw(GLOW).rounded_rectangle([_gs * 0.2, _gs * 0.2, _gs * 0.8, _gs * 0.8], int(_gs * 0.15),
+                                       fill=(90, 160, 255, 150))
+GLOW = GLOW.filter(ImageFilter.GaussianBlur(_gs * 0.07))
+random.seed(3)
+DOTS = [(random.uniform(0, W), random.uniform(0, H), random.uniform(1.5, 4.5) * K, random.uniform(20, 70) * K,
+         random.uniform(0, 6.28)) for _ in range(45)]
+
+
+def persp_coeffs(dst, src):
+    A, B = [], []
+    for (x, y), (u, v) in zip(dst, src):
+        A.append([x, y, 1, 0, 0, 0, -u * x, -u * y]); B.append(u)
+        A.append([0, 0, 0, x, y, 1, -v * x, -v * y]); B.append(v)
+    return np.linalg.solve(np.array(A, float), np.array(B, float))
+
+
+def project(rx, ry, z0, scale):
+    """Karta burchaklarini 3D aylantirib, kanvasga proyeksiyalaydi (2x o'lchamda)."""
+    half = CW2 / 2 * scale
+    cam = CW2 * 2.6
+    a, b = np.radians(rx), np.radians(ry)
+    pts = []
+    for x, y in ((-half, -half), (half, -half), (half, half), (-half, half)):
+        z = z0 * scale
+        x1, z1 = x * np.cos(b) + z * np.sin(b), -x * np.sin(b) + z * np.cos(b)
+        y1, z2 = y * np.cos(a) - z1 * np.sin(a), y * np.sin(a) + z1 * np.cos(a)
+        f = cam / (cam + z2)
+        pts.append((CANVAS * SS / 2 + x1 * f, CANVAS * SS / 2 + y1 * f))
+    return pts
+
+
+SRC = [(0, 0), (CW2, 0), (CW2, CW2), (0, CW2)]
+
+
+def warp(tex, pts, resample=Image.BICUBIC):
+    c = persp_coeffs(pts, SRC)
+    return tex.transform((CANVAS * SS, CANVAS * SS), Image.PERSPECTIVE, tuple(c), resample)
+
+
+def glint_tex(u):
+    """Karta ustidan o'tuvchi yaltiroq diagonal nur."""
+    if u <= -0.4 or u >= 1.4:
+        return CARD_TEX
+    yy, xx = np.mgrid[0:CW2, 0:CW2].astype(np.float32) / CW2
+    band = np.exp(-(((xx + yy) / 2 - u) / 0.07) ** 2) * 0.55
+    arr = np.asarray(CARD_TEX, np.float32).copy()
+    arr[..., :3] += (255 - arr[..., :3]) * band[..., None]
+    return Image.fromarray(arr.clip(0, 255).astype(np.uint8), "RGBA")
+
+
+def render_outro(lt):
+    f = OUTRO_BG.copy()
+    img = Image.fromarray(f.clip(0, 255).astype(np.uint8)).convert("RGBA")
+    d = ImageDraw.Draw(img)
+    for x, y, r, sp, ph in DOTS:
+        yy = (y - lt * sp) % H
+        al = int(70 + 60 * np.sin(lt * 2 + ph))
+        d.ellipse([x - r, yy - r, x + r, yy + r], fill=(150, 190, 255, max(0, al)))
+    # harakat: chetdan aylanib kirib keladi, so'ng sekin 3D tebranadi
+    p = ease_back(lt / 1.25, 1.3)
+    sway = smooth((lt - 1.0) / 0.8)
+    ry = -82 * (1 - p) + sway * 13 * np.sin((lt - 1.0) * 1.7)
+    rx = 22 * (1 - p) + sway * 6 * np.sin((lt - 1.0) * 1.25 + 0.6)
+    scale = 0.55 + 0.45 * ease(lt / 1.1)
+    alpha = smooth(lt / 0.35)
+    cx, cy = W / 2, H * 0.47 + np.sin(lt * 1.9) * H * 0.006
+    # soya
+    sh = SHADOW.resize((max(1, int(SHADOW.width * scale)), max(1, int(SHADOW.height * scale))))
+    sh.putalpha(Image.fromarray((np.asarray(sh.getchannel("A"), np.float32) * alpha * 0.8).astype(np.uint8)))
+    img.alpha_composite(sh, (int(cx - sh.width / 2), int(cy + CARD_W * 0.55 * scale - sh.height / 2 + CARD_W * 0.1)))
+    # karta orqasidagi nur
+    gl = GLOW.resize((max(1, int(GLOW.width * scale)),) * 2)
+    gl.putalpha(Image.fromarray((np.asarray(gl.getchannel("A"), np.float32) * alpha).astype(np.uint8)))
+    img.alpha_composite(gl, (int(cx - gl.width / 2), int(cy - gl.height / 2)))
+    # qalinlik: orqadan oldinga bir nechta to'q ko'k qatlam
+    layer = Image.new("RGBA", (CANVAS * SS, CANVAS * SS), (0, 0, 0, 0))
+    T = CW2 * 0.07
+    for k in range(7, 0, -1):
+        c = (int(10 + 12 * (7 - k)), int(22 + 16 * (7 - k)), int(90 + 18 * (7 - k)), 255)
+        solid = Image.new("RGBA", (CW2, CW2), c)
+        solid.putalpha(CARD_MASK)
+        layer.alpha_composite(warp(solid, project(rx, ry, T * k / 7, scale), Image.BILINEAR))
+    layer.alpha_composite(warp(glint_tex((lt - 1.45) / 0.9 * 1.6 - 0.3), project(rx, ry, 0, scale)))
+    layer = layer.resize((CANVAS, CANVAS), Image.LANCZOS)
+    if alpha < 1:
+        layer.putalpha(Image.fromarray((np.asarray(layer.getchannel("A"), np.float32) * alpha).astype(np.uint8)))
+    img.alpha_composite(layer, (int(cx - CANVAS / 2), int(cy - CANVAS / 2)))
+    return np.asarray(img.convert("RGB"), np.float32)
 
 # ---------- statik qatlamlar ----------
 yy = np.linspace(0, 1, H)[:, None]
@@ -205,7 +318,7 @@ def scene_rgb(i, lt):
 
 def render(t):
     if t >= OUTRO_START:
-        o = OUTRO[min(len(OUTRO) - 1, int((t - OUTRO_START) * FPS))].astype(np.float32)
+        o = render_outro(t - OUTRO_START)
         a = smooth((t - OUTRO_START) / XF)
         if a >= 1:
             return o
