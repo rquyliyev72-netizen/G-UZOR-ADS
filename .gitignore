@@ -1,0 +1,4 @@
+# render paytidagi vaqtinchalik fayllar
+*.part[0-9]*.mp4
+*.noaudio.mp4
+*.parts.txt
